@@ -1,0 +1,1 @@
+from core.parsers.article_parsers.scientificamerican_parser import ScientificamericanParser
