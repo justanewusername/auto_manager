@@ -1,6 +1,8 @@
 from bestconfig import Config
-from core.parsers.article_parsers import ScientificamericanParser
+from core.parsers.article_parsers import ScientificamericanParser, MITParser
 from scrapy.crawler import CrawlerProcess
+from core.parsers import MultiParser
+from core.schedule.schedule import Schedule
 import csv
 
 def readCSV():
@@ -18,20 +20,22 @@ def main():
     config = Config()
     print(config['version'])
     
+    interval_days = 7
     
-    # start scraper
-    process = CrawlerProcess({
-        'USER_AGENT': config['USER_AGENT']
-    })
+    # start schedule
+    schedule = Schedule(run_parsers, interval_days)
+    schedule.run()
+    
+    # articles = readCSV()
+    
+    # print(len(articles))
+    # # print(articles[0]['title'])
+    # # print(articles[0]['content'])
+    
 
-    # result = process.crawl(ScientificamericanParser)
-    # process.start()
-    
-    articles = readCSV()
-    
-    print(len(articles))
-    print(articles[0]['title'])
-    print(articles[0]['content'])
+def run_parsers():
+    multiParser = MultiParser()
+    multiParser.run()
 
 if __name__ == '__main__':
     main()

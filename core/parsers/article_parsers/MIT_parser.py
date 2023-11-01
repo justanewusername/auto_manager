@@ -1,4 +1,5 @@
 import scrapy
+from datetime import datetime
 
 class MITParser(scrapy.Spider):
     name = 'scientificamerican-scryper'
@@ -13,10 +14,16 @@ class MITParser(scrapy.Spider):
     def parse(self, response):
         articles = response.css('.page-term--views--list')
         ARTICLE_TAG = 'article'
-        print('starting')
+        days_difference = 7
         
         for article in articles.css(ARTICLE_TAG):
             article_url = article.css('h3 a').attrib['href']
+            article_date = article.css('time ::text').get()
+            article_date = datetime.strptime(article_date, "%B %d, %Y")
+            
+            # date checking
+            if (datetime.today() - article_date).days > days_difference:
+                continue
             yield response.follow(article_url, callback=self.parse_article)
 
     def parse_article(self, response):

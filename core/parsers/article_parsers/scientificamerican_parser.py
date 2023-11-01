@@ -12,7 +12,6 @@ class ScientificamericanParser(scrapy.Spider):
     
     def parse(self, response):
         ARTICLE_TAG = 'article'
-        print('starting')
         
         for article in response.css(ARTICLE_TAG):
             article_url = article.css('header h2 a').attrib['href']

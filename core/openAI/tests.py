@@ -1,6 +1,6 @@
 import openai
 
-api_key = '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'
+api_key = ''
 
 user_input = 'Explain how solar energy works.'
 
