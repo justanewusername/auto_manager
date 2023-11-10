@@ -2,12 +2,12 @@ import openai
 
 api_key = ''
 
-user_input = 'Explain how solar energy works.'
+prompt = ''
 
 # Вызов API ChatGPT
 response = openai.Completion.create(
     engine="davinci",
-    prompt=user_input,
+    prompt=prompt,
     max_tokens=50,
     api_key=api_key
 )

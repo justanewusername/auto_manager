@@ -1,6 +1,6 @@
 from scrapy.crawler import CrawlerProcess
 from bestconfig import Config
-from core.parsers.article_parsers import ScientificamericanParser, MITParser
+from core.parsers.article_parsers import ScientificamericanParser, MITParser, ExtremetechParser
 from scrapy.utils.project import get_project_settings
 
 class MultiParser:
@@ -12,5 +12,6 @@ class MultiParser:
     
     def run(self):
         self.crawler_process.crawl(ScientificamericanParser)
-        self.crawler_process.crawl(MITParser)
+        # self.crawler_process.crawl(MITParser)
+        # self.crawler_process.crawl(ExtremetechParser)
         self.crawler_process.start()

@@ -20,16 +20,16 @@ def main():
     config = Config()
     print(config['version'])
     
-    interval_days = 7
+    interval_days = 14
     
     # start schedule
     schedule = Schedule(run_parsers, interval_days)
     schedule.run()
     
-    # articles = readCSV()
+    articles = readCSV()
     
-    # print(len(articles))
-    # # print(articles[0]['title'])
+    print(len(articles))
+    # print(articles[0]['title'])
     # # print(articles[0]['content'])
     
 
@@ -39,4 +39,3 @@ def run_parsers():
 
 if __name__ == '__main__':
     main()
-    

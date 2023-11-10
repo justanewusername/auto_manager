@@ -6,3 +6,7 @@ MYSQL_HOST: 'localhost'
 MYSQL_DATABASE: 'mydatabase'
 MYSQL_USER: 'root'
 MYSQL_PASSWORD: 'mypassword'
+
+
+# telegram
+API_TOKEN: '5117169385:AAEMJp6qWx3-a4B_FxlJ1WiWf8v3qA87Ojc'

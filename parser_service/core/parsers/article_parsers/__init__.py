@@ -1,0 +1,3 @@
+from core.parsers.article_parsers.scientificamerican_parser import ScientificamericanParser
+from core.parsers.article_parsers.MIT_parser import MITParser
+from core.parsers.article_parsers.extremetech import ExtremetechParser

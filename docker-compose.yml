@@ -1,0 +1,12 @@
+version: '1.0.0'
+
+services:
+    parser_service:
+        build:
+            context: .
+            dockerfile: parser_service/Dockerfile
+        ports:
+            - 8000:8000
+        volumes:
+            - .:/app
+        command: poetry run python main.py

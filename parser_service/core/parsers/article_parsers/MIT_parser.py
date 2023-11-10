@@ -14,7 +14,7 @@ class MITParser(scrapy.Spider):
     def parse(self, response):
         articles = response.css('.page-term--views--list')
         ARTICLE_TAG = 'article'
-        days_difference = 7
+        days_difference = 20
         
         for article in articles.css(ARTICLE_TAG):
             article_url = article.css('h3 a').attrib['href']
