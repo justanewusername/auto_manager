@@ -7,6 +7,7 @@ class ScientificamericanParser(scrapy.Spider):
         'ITEM_PIPELINES': {
             'core.parsers.article_parsers.pipelines.CleaningPipeline': 300,
             'core.parsers.article_parsers.pipelines.CsvExportPipeline': 400,
+            'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
     
@@ -24,4 +25,5 @@ class ScientificamericanParser(scrapy.Spider):
         yield {
             'title': title,
             'content': content,
+            'url': response.request.url,
         }

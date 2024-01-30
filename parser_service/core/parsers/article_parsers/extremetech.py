@@ -9,6 +9,7 @@ class ExtremetechParser(scrapy.Spider):
         'ITEM_PIPELINES': {
             'core.parsers.article_parsers.pipelines.CleaningPipeline': 300,
             'core.parsers.article_parsers.pipelines.CsvExportPipeline': 400,
+            'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
     
@@ -24,29 +25,20 @@ class ExtremetechParser(scrapy.Spider):
             article_date = article_date[:-6]
             date_format = '%a, %d %b %Y %H:%M:%S'
             article_date = datetime.strptime(article_date, date_format)
-            
-            print('11111111111111111111111111')
-            print(article_date)
+
             now_date = datetime.now()
-            print(now_date)
-            print(now_date - article_date)
-            print((now_date - article_date).days)
-            print('***********************')
             # date checking
             if (now_date - article_date).days > days_difference:
                 print('what????')
                 continue
-            print('hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh')
             yield response.follow('https://www.extremetech.com/tag/artificial-intelligence' + article_url, callback=self.parse_article)
 
     def parse_article(self, response):
         title = response.css('h1::text').get()
-        print('********______**********')
-        print(" ".join(response.css('main section .editor-content ::text').getall()))
-        print('********______*********')
         content = " ".join(response.css('main section .editor-content ::text').getall())
 
         yield {
             'title': title,
             'content': content,
+            'url': response.request.url,
         }

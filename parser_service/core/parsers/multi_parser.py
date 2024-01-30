@@ -12,6 +12,6 @@ class MultiParser:
     
     def run(self):
         self.crawler_process.crawl(ScientificamericanParser)
-        # self.crawler_process.crawl(MITParser)
-        # self.crawler_process.crawl(ExtremetechParser)
+        self.crawler_process.crawl(MITParser)
+        self.crawler_process.crawl(ExtremetechParser)
         self.crawler_process.start()

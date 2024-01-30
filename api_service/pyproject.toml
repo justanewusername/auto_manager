@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "api-service"
+version = "0.1.0"
+description = ""
+authors = ["max <maxim.geer@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.11.6"
+fastapi = "^0.109.0"
+uvicorn = "^0.27.0"
+pika = "^1.3.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,17 +1,18 @@
 [tool.poetry]
-name = "auto-manager"
+name = "parser-service"
 version = "0.1.0"
 description = ""
-authors = ["geer.max0404 <geer.max0404@gmail.com>"]
+authors = ["max"]
 readme = "README.md"
-packages = [{include = "auto_manager"}]
 
 [tool.poetry.dependencies]
-python = "^3.12"
-bestconfig = "^1.3.6"
+python = "3.11.6"
 scrapy = "^2.11.0"
-mysql-connector-python = "^8.1.0"
 pytz = "^2023.3.post1"
+mysql-connector-python = "^8.2.0"
+pika = "^1.3.2"
+bestconfig = "^1.3.6"
+beautifulsoup4 = "^4.12.2"
 
 
 [build-system]

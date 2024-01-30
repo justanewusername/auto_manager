@@ -1,0 +1,3 @@
+GPT_KEY: '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'
+GPT_MODEL: 'gpt-3.5-turbo-instruct'
+DB_STRING: 'postgresql://user:qwerty@db:5432/mydbname'

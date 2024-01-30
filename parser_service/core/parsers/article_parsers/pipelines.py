@@ -2,6 +2,9 @@ import csv
 from bestconfig import Config
 from scrapy.exporters import CsvItemExporter
 import mysql.connector
+import json
+from bs4 import BeautifulSoup
+from core.broker.broker_manager import BrokerManager
 
 
 class CleaningPipeline:
@@ -10,7 +13,24 @@ class CleaningPipeline:
             cleaned_content = item['content'].replace('\n', ' ').replace('\t', ' ').replace('  ', ' ')
             item['content'] = cleaned_content
         return item
-    
+
+class BrokerPipeline:
+    def process_item(self, item, spider):
+        if 'content' in item:
+            soup = BeautifulSoup(item['content'], 'html.parser')
+            if soup.find(True):
+                print("найден тэг")
+                return ""
+            queue_name = 'articles'
+            broker = BrokerManager(queue_name, 'broker')
+            msg = json.dumps({'content': item['content'], 'url': item['url'], 'destination': 'aposts'})
+            broker.send_msg(msg)
+            # broker.channel.basic_publish(exchange='', routing_key=queue_name, body=msg)
+            # broker.connection.close()
+            broker.close()
+        return item
+
+
 # сохранение в файл
 class CsvExportPipeline:
     def __init__(self):

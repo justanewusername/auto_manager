@@ -11,7 +11,7 @@ class Schedule:
 
         def perform_method():
             self.method()
-            # s.enter(self.interval_days * 24 * 60, 1, perform_method)
+            s.enter(self.interval_days * 24 * 60, 1, perform_method)
 
         perform_method()
         s.run()
