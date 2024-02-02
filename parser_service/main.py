@@ -19,13 +19,18 @@ def readCSV():
             objects.append(row)
     return objects
 
-def run_parsers():
+def run_parsers(site='all'):
     multiParser = MultiParser()
-    multiParser.run()
+    multiParser.run(site=site)
 
 def callback(ch, method, properties, body):
     print("recived")
-    run_parsers()
+    
+    msg = json.loads(body)
+    if msg in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
+        run_parsers(msg)
+    else:    
+        run_parsers()
 
 def second_process():
     queue_name = 'apiparser'
@@ -41,12 +46,15 @@ def main():
     
     interval_days = 14
 
-    s_process = multiprocessing.Process(target=second_process)
-    s_process.start()
-    
+    # s_process = multiprocessing.Process(target=second_process)
+    # s_process.start()
+
+    # run_parsers()
+    second_process()
+
     # start schedule
-    schedule = Schedule(run_parsers, interval_days)
-    schedule.run()
+    # schedule = Schedule(run_parsers, interval_days)
+    # schedule.run()
     
     # articles = readCSV()
     
@@ -60,9 +68,4 @@ def main():
 ###########################################
 
 if __name__ == "__main__":
-
-    eternal_process = multiprocessing.Process(target=main)
-    eternal_process.start()
-
-    eternal_process.join()  # Ждем, пока вечный процесс не завершится
-    print("all ended")
+    main()

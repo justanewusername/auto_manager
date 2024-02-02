@@ -8,6 +8,7 @@ class MITParser(scrapy.Spider):
         'ITEM_PIPELINES': {
             'core.parsers.article_parsers.pipelines.CleaningPipeline': 300,
             'core.parsers.article_parsers.pipelines.CsvExportPipeline': 400,
+            'core.parsers.article_parsers.pipelines.PostgresPipeline': 450,
             'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
@@ -15,7 +16,7 @@ class MITParser(scrapy.Spider):
     def parse(self, response):
         articles = response.css('.page-term--views--list')
         ARTICLE_TAG = 'article'
-        days_difference = 20
+        days_difference = self.settings.get('days_difference', 20)
         
         for article in articles.css(ARTICLE_TAG):
             article_url = article.css('h3 a').attrib['href']

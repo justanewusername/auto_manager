@@ -2,9 +2,11 @@ import csv
 from bestconfig import Config
 from scrapy.exporters import CsvItemExporter
 import mysql.connector
+from core.database_manager import DatabaseManager
 import json
 from bs4 import BeautifulSoup
 from core.broker.broker_manager import BrokerManager
+import tiktoken
 
 
 class CleaningPipeline:
@@ -12,7 +14,19 @@ class CleaningPipeline:
         if 'content' in item:
             cleaned_content = item['content'].replace('\n', ' ').replace('\t', ' ').replace('  ', ' ')
             item['content'] = cleaned_content
+
+            # checking token limit
+            tokens_count = self.num_tokens_from_string(item['content'])
+
+            max_length = 12000
+            if tokens_count > 4000:
+                item['content'] = item['content'][:max_length]
         return item
+
+    def num_tokens_from_string(self, string: str) -> int:
+        encoding = tiktoken.encoding_for_model("gpt-3.5-turbo")
+        num_tokens = len(encoding.encode(string))
+        return num_tokens
 
 class BrokerPipeline:
     def process_item(self, item, spider):
@@ -46,6 +60,14 @@ class CsvExportPipeline:
         self.exporter.finish_exporting()
         self.file.close()
 
+
+class PostgresPipeline:
+    def __init__(self):
+        self.db_manager = DatabaseManager('postgresql://user:qwerty@db:5432/mydbname')
+
+    def process_item(self, item, spider):
+        self.db_manager.create_post(article=item['content'], title=item['title'], url=item['url'])
+        return item
 
 # сохранение в БД
 class MySQLPipeline:

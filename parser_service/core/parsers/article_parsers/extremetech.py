@@ -9,6 +9,7 @@ class ExtremetechParser(scrapy.Spider):
         'ITEM_PIPELINES': {
             'core.parsers.article_parsers.pipelines.CleaningPipeline': 300,
             'core.parsers.article_parsers.pipelines.CsvExportPipeline': 400,
+            'core.parsers.article_parsers.pipelines.PostgresPipeline': 450,
             'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
@@ -16,7 +17,7 @@ class ExtremetechParser(scrapy.Spider):
     def parse(self, response):
         articles = response.css('main section section')
         ARTICLE_TAG = '.item.flex.mt-4'
-        days_difference = 15
+        days_difference = self.settings.get('days_difference', 15)
         for article in articles.css(ARTICLE_TAG):
             article_url = article.css('a').attrib['href']
             article_date = article.css('time ::attr(datetime)').get()
@@ -29,7 +30,6 @@ class ExtremetechParser(scrapy.Spider):
             now_date = datetime.now()
             # date checking
             if (now_date - article_date).days > days_difference:
-                print('what????')
                 continue
             yield response.follow('https://www.extremetech.com/tag/artificial-intelligence' + article_url, callback=self.parse_article)
 

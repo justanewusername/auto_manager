@@ -14,7 +14,7 @@ from core.database_manager import DatabaseManager
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 # Настройки телеграм-бота
 config = Config()
-API_TOKEN = config['API_TOKEN']
+API_TOKEN = str(config['API_TOKEN'])
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 

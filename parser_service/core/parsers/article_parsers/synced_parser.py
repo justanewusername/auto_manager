@@ -1,8 +1,8 @@
 import scrapy
 
-class ScientificamericanParser(scrapy.Spider):
+class SyncedParser(scrapy.Spider):
     name = 'scientificamerican-scryper'
-    start_urls = ['https://www.scientificamerican.com/artificial-intelligence/']
+    start_urls = ['https://syncedreview.com/category/popular/']
     custom_settings = {
         'ITEM_PIPELINES': {
             'core.parsers.article_parsers.pipelines.CleaningPipeline': 300,
@@ -14,18 +14,9 @@ class ScientificamericanParser(scrapy.Spider):
     
     def parse(self, response):
         ARTICLE_TAG = 'article'
-        days_difference = self.settings.get('days_difference', 20)
         
-        max_articles_count = 5
-
-        current_article_index = 0
         for article in response.css(ARTICLE_TAG):
-            article_url = article.css('a').attrib['href']
-
-            current_article_index += 1
-            if current_article_index > max_articles_count:
-                break
-            
+            article_url = article.css('header h2 a').attrib['href']
             yield response.follow(article_url, callback=self.parse_article)
 
     def parse_article(self, response):
