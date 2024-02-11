@@ -18,7 +18,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# start parsing
 # get post from article
 # get articles
 
