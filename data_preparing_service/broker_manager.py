@@ -4,7 +4,8 @@ class BrokerManager:
     def __init__(self, queue_name: str, host: str):
         self.queue_name = queue_name
 
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, heartbeat=6000,
+                                       blocked_connection_timeout=3000))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue=queue_name)
 

@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI, Response
 from docx import Document
+import json
 import io
 
 app = FastAPI()
@@ -70,15 +71,21 @@ def delete_all():
     return result
 
 @app.post("/del/")
-async def create_item(item: Item):
+async def delete_item(item: Item):
     result = databaseManager.delete_post_by_identifier(item.name)
+    return result
+
+@app.post("/create/")
+async def create_item(item: Item):
+    result = databaseManager.create_post(item.name)
     return result
 
 @app.post("/run/")
 async def create_item(item: Item):
     queue_name = 'apiparser'
     broker = BrokerManager(queue_name, 'broker')
-    msg = item.name # all, Scientificamerican, MIT, Extremetech
+    # msg = item.name # all, Scientificamerican, MIT, Extremetech
+    msg = json.dumps({'resource': item.name})
     broker.send_msg(msg)
     broker.close()
-    return 'wow'
+    return item.name
