@@ -33,16 +33,11 @@ def run_parsers(site='all'):
 def callback(ch, method, properties, body):
     print("recived")
     print(body)
-    print(")))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))")
-
     
     msg = json.loads(body)
-    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,")
     if msg['resource'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
-        print("ruuuuuuuuuuuun")
         run_scrapy()
     else:
-        print('ruuuuuuuuuuuuuuuuuuuuuuun')
         run_scrapy()
 
 def second_process():

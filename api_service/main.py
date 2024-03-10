@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from database_manager import DatabaseManager
 from fastapi.middleware.cors import CORSMiddleware
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, status, HTTPException
 from docx import Document
 import json
 import io
@@ -29,9 +29,8 @@ databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
 class Item(BaseModel):
     name: str
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+class ItemNumber(BaseModel):
+    number: int
 
 @app.get("/download/all/")
 def download_all_posts():
@@ -89,3 +88,22 @@ async def create_item(item: Item):
     broker.send_msg(msg)
     broker.close()
     return item.name
+
+@app.post("/favorites/create/")
+async def create_item(item: ItemNumber):
+    try:
+        result = databaseManager.add_to_favorites(item.number)
+    except:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+    return result
+
+@app.post("/favorites/del/")
+async def create_item(item: ItemNumber):
+    try:
+        result = databaseManager.delete_from_favorites(item.number)
+    except:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+    
+    if not result:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No post found with id {item.number} in favorites")
+    return result
