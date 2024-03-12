@@ -37,7 +37,12 @@ class BrokerPipeline:
                 return ""
             queue_name = 'articles'
             broker = BrokerManager(queue_name, 'broker')
-            msg = json.dumps({'content': item['content'], 'title': item['title'], 'url': item['url'], 'destination': 'posts'})
+            msg = json.dumps({'content': item['content'], 
+                              'title': item['title'], 
+                              'url': item['url'], 
+                              'destination': 'posts',
+                              'category': item['category'],
+                              'resource': item['resource']})
             broker.send_msg(msg)
             # broker.channel.basic_publish(exchange='', routing_key=queue_name, body=msg)
             # broker.connection.close()

@@ -70,8 +70,8 @@ def delete_all():
     return result
 
 @app.post("/del/")
-async def delete_item(item: Item):
-    result = databaseManager.delete_post_by_identifier(item.name)
+async def delete_item(item: ItemNumber):
+    result = databaseManager.delete_post_by_id(item.number)
     return result
 
 @app.post("/create/")

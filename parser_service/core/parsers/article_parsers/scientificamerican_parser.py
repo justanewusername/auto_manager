@@ -36,4 +36,6 @@ class ScientificamericanParser(scrapy.Spider):
             'title': title,
             'content': content,
             'url': response.request.url,
+            'category': 'AI',
+            'resource': 'scientificamerican'
         }

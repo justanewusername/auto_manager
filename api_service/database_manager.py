@@ -16,6 +16,8 @@ class DatabaseManager:
             article = Column(String, unique=True)
             title = Column(String, nullable=True)
             url = Column(String, nullable=True)
+            category = Column(String, nullable=True)
+            resource = Column(String, nullable=True)
 
         class Favorites(self.Base):
             __tablename__ = "favorites"
@@ -105,6 +107,23 @@ class DatabaseManager:
                 return {"message": f"Post with {identifier} deleted successfully"}
             else:
                 return {"message": f"No post found with {identifier}"}
+        except Exception as e:
+            session.rollback()
+            raise e
+        finally:
+            session.close()
+
+    def delete_post_by_id(self, post_id: int):
+        session = self.SessionLocal()
+        try:
+            post_to_delete = session.query(self.Post).filter(self.Post.id == post_id).first()
+
+            if post_to_delete:
+                session.delete(post_to_delete)
+                session.commit()
+                return {"message": f"Post with {post_id} deleted successfully"}
+            else:
+                return {"message": f"No post found with {post_id}"}
         except Exception as e:
             session.rollback()
             raise e

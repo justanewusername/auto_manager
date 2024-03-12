@@ -19,7 +19,7 @@ def callback(ch, method, properties, body):
         return
 
     db_manager = DatabaseManager('postgresql://user:qwerty@db:5432/mydbname')
-    db_manager.create_post(post, msg['title'], msg['url'])
+    db_manager.create_post(post, msg['title'], msg['url'], msg['category'], msg['resource'])
     print('post saved.')
 
     # send post

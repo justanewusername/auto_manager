@@ -1,3 +1,4 @@
+from nis import cat
 from sqlalchemy import create_engine, Column, Integer, String, or_
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -11,18 +12,20 @@ class DatabaseManager:
 
         # Определение модели данных (ORM)
         class Posts(self.Base):
-            __tablename__ = "items"
+            __tablename__ = "posts"
             id = Column(Integer, primary_key=True)
             article = Column(String, unique=True)
             title = Column(String, nullable=True)
             url = Column(String, nullable=True)
+            category = Column(String, nullable=True)
+            resource = Column(String, nullable=True)
 
         self.Post = Posts
         self.Base.metadata.create_all(bind=self.engine)
 
-    def create_post(self, article: str, title: str, url: str):
+    def create_post(self, article: str, title: str, url: str, category: str, resource: str):
         session = self.SessionLocal()
-        new_post = self.Post(article=article, title=title, url=url)
+        new_post = self.Post(article=article, title=title, url=url, category=category, resource=resource)
         session.add(new_post)
         
         session.flush()

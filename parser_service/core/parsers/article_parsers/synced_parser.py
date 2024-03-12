@@ -1,7 +1,7 @@
 import scrapy
 
 class SyncedParser(scrapy.Spider):
-    name = 'scientificamerican-scryper'
+    name = 'Synced'
     start_urls = ['https://syncedreview.com/category/popular/']
     custom_settings = {
         'ITEM_PIPELINES': {
@@ -27,4 +27,6 @@ class SyncedParser(scrapy.Spider):
             'title': title,
             'content': content,
             'url': response.request.url,
+            'category': 'AI',
+            'resource': 'synced'
         }

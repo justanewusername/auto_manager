@@ -23,7 +23,6 @@ def readCSV():
 
 
 def run_scrapy():
-    # cmdline.execute("scrapy runspider ./core/parsers/article_parsers/MIT_parser.py".split())
     cmdline.execute("scrapy runspider ./core/parsers/article_parsers/venturebeat_parser.py".split())
 
 def run_parsers(site='all'):
@@ -36,9 +35,9 @@ def callback(ch, method, properties, body):
     
     msg = json.loads(body)
     if msg['resource'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
-        run_scrapy()
+        run_parsers()
     else:
-        run_scrapy()
+        run_parsers()
 
 def second_process():
     queue_name = 'apiparser'

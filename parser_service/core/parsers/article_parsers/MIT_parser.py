@@ -36,4 +36,6 @@ class MITParser(scrapy.Spider):
             'title': title,
             'content': content,
             'url': response.request.url,
+            'category': 'AI',
+            'resource': 'MIT'
         }
