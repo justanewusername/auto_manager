@@ -8,10 +8,30 @@ const PostsContainer = forwardRef((props, ref) => {
     // const [tiles, setTiles] = useState();
     let tiles = [ ];
 
+    useEffect(() => {
+        if(props.filter !== "all") {
+          setPosts(posts.filter(obj => obj['resource'] == props.filter))
+        } else {
+          getPosts()
+        }
+    }, [props.filter]);
+    
+
     const getPosts = () => {
-      axios.get(props.url) //get("http://localhost:8811/all")
+      console.log(props.url)
+      axios.get(props.url)
       .then(response => {
-        setPosts(response.data);
+        response.data.forEach(x => console.log(x.resource));
+
+        if(props.url == "http://localhost:8811/favorites") {
+          let temp = response.data
+          temp = temp.filter(obj => obj['in_favorites'] === true)
+          setPosts(temp);
+          console.log(temp)
+        } else {
+          setPosts(response.data);
+        }
+
       })
       .catch(error => {
         console.error("Error fetching posts:", error);
@@ -27,6 +47,7 @@ const PostsContainer = forwardRef((props, ref) => {
       };
 
     useEffect(() => {
+      console.log("ede")
         // Fetch posts from the external API
         getPosts()
     }, [props.url]);

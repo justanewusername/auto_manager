@@ -3,19 +3,19 @@ import axios from "axios";
 import './control.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
-function Control({ changePage, onRefreshClick }) {
+function Control({ changePage, onRefreshClick, setFilter }) {
     const [selectedResourceOption, setSelectedResourceOption] = useState("all");
     const [selectedTypeOption, setSelectedTypeOption] = useState("all");
     const [response, setResponse] = useState(null);
 
     const resourcesOptions = [
         "all", 
-        "Scientificamerican", 
+        "scientificamerican", 
         "MIT", 
-        "Extremetech", 
-        'Gizmodo', 
-        'Venturebeat', 
-        'Synced',
+        "extremetech", 
+        'gizmodo', 
+        'venturebeat', 
+        'synced',
     ];
     const typeOptions = ["all", "AI", "Tech"];
 
@@ -26,6 +26,10 @@ function Control({ changePage, onRefreshClick }) {
     const handleTypeOptionChange = (event) => {
         setSelectedTypeOption(event.target.value);
     };
+
+    const applyFilters = () => {
+        setFilter(selectedResourceOption);
+    }
 
     const postData = async () => {
         try {
@@ -83,7 +87,8 @@ function Control({ changePage, onRefreshClick }) {
                         ))}
                     </select>
                 </div>
-                <button onClick={postData}>Применить</button>
+                <button onClick={applyFilters}>Применить</button>
+                <button onClick={postData}>Запустить парсер</button>
             </div>
 
             <div className="panel__right">

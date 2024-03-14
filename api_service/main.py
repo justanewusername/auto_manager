@@ -89,6 +89,11 @@ async def create_item(item: Item):
     broker.close()
     return item.name
 
+@app.get("/favorites/")
+def get_all_favorites():
+    result = databaseManager.get_all_posts()
+    return result
+
 @app.post("/favorites/create/")
 async def create_item(item: ItemNumber):
     try:

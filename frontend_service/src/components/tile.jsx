@@ -1,16 +1,24 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import './tile.css'
 import axios from "axios";
 
 function Tile(props) {
-    const {isInFavorites, setIsInFavorites} = useState(props.in_favorite)
+    console.log("hello", props.in_favorite)
+    const [isInFavorites, setIsInFavorites] = useState(props.in_favorite)
 
     const handleDelete = () => {
         props.onDelete(props.tileId);
     };
 
+    useEffect(() => {
+      }, [isInFavorites]);
+  
+    useEffect(() => {
+        setIsInFavorites(props.in_favorite);
+    }, [props.in_favorite]);
+
     const deletePost = () => {
-        axios.post("http://localhost:8811/del", {name: props.tileId})
+        axios.post("http://localhost:8811/del", {"number": props.tileId})
         .then(response => {
             handleDelete();
         })
@@ -29,7 +37,7 @@ function Tile(props) {
     }
 
     const addToFavorites = () => {
-        axios.post("http://localhost:8811/favorites/create/", {name: props.tileId})
+        axios.post("http://localhost:8811/favorites/create/", {number: props.tileId})
         .then(response => {
             setIsInFavorites(true)
         })
@@ -39,7 +47,7 @@ function Tile(props) {
     }
 
     const removeFromFavorites = () => {
-        axios.post("http://localhost:8811/favorites/del/", {name: props.tileId})
+        axios.post("http://localhost:8811/favorites/del/", {number: props.tileId})
         .then(response => {
             setIsInFavorites(false)
         })

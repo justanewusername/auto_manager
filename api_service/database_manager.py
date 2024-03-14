@@ -13,7 +13,7 @@ class DatabaseManager:
         class Posts(self.Base):
             __tablename__ = "posts"
             id = Column(Integer, primary_key=True)
-            article = Column(String, unique=True)
+            article = Column(String(32000), unique=True)
             title = Column(String, nullable=True)
             url = Column(String, nullable=True)
             category = Column(String, nullable=True)
@@ -147,7 +147,7 @@ class DatabaseManager:
     def delete_from_favorites(self, favorite_id: int):
         session = self.SessionLocal()
         try:
-            favorite_to_delete = session.query(self.Favorites).filter(self.Favorites.id == favorite_id).first()
+            favorite_to_delete = session.query(self.Favorites).filter(self.Favorites.post_id == favorite_id).first()
 
             if favorite_to_delete:
                 session.delete(favorite_to_delete)
@@ -160,3 +160,22 @@ class DatabaseManager:
             raise e
         finally:
             session.close()
+
+    def get_all_favorites(self):
+        session = self.SessionLocal()
+
+        posts = session.query(self.Post, exists().where(self.Favorites.post_id == self.Post.id).label('in_favorites')).all()
+
+        session.expunge_all()
+        session.close()
+        if posts is None:
+            return None
+
+        posts_list = []
+        for item in posts:
+            dict_item = {**item[0].__dict__, 'in_favorites': item.in_favorites}
+            if dict_item["in_favorites"] == False:
+                continue
+            posts_list.append(dict_item)
+
+        return posts_list

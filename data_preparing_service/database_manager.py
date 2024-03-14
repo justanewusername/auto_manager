@@ -7,14 +7,14 @@ from sqlalchemy.ext.declarative import declarative_base
 class DatabaseManager:
     def __init__(self, database_url: str):
         self.engine = create_engine(database_url)
-        self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
+        self.SessionLocal = sessionmaker(autocommit=False, autoflush=True, bind=self.engine)
         self.Base = declarative_base()
 
         # Определение модели данных (ORM)
         class Posts(self.Base):
             __tablename__ = "posts"
             id = Column(Integer, primary_key=True)
-            article = Column(String, unique=True)
+            article = Column(String(32000), unique=True)
             title = Column(String, nullable=True)
             url = Column(String, nullable=True)
             category = Column(String, nullable=True)

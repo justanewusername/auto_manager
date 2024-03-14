@@ -8,6 +8,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 function App() {
   const postContainerRef = useRef(null);
   const [postContainerUrl, setPostContainerUrl] = useState("http://localhost:8811/all");
+  const [resourcefilter, setResourcefilter] =  useState("all");
 
 
 
@@ -15,22 +16,22 @@ function App() {
     postContainerRef.current.getPosts();
   }, []);
 
+  const setFilter = (filter) => {
+    setResourcefilter(filter);
+  }
+
   const changePage = (currentPage) => {
     if(currentPage === "main") {
       setPostContainerUrl("http://localhost:8811/all")
     } else {
-      setPostContainerUrl("http://localhost:8811/hello")
+      setPostContainerUrl("http://localhost:8811/favorites")
     }
   };
 
   return (
     <div className="App">
-      <Control changePage={changePage} onRefreshClick={refresh}/>
-      <PostsContainer url={postContainerUrl} ref={postContainerRef}/>
-      {/* <Routes>
-        <Route path="/" element={<PostsContainer url={postContainerUrl} ref={postContainerRef}/>}/>
-        <Route path='/favorites' element={<Favorites />}/>
-      </Routes> */}
+      <Control changePage={changePage} onRefreshClick={refresh} setFilter={setFilter}/>
+      <PostsContainer url={postContainerUrl} filter={resourcefilter} ref={postContainerRef}/>
     </div>
   );
 }
