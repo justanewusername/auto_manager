@@ -7,7 +7,7 @@ class ScientificamericanParser(scrapy.Spider):
         'ITEM_PIPELINES': {
             'core.parsers.article_parsers.pipelines.CleaningPipeline': 300,
             'core.parsers.article_parsers.pipelines.CsvExportPipeline': 400,
-            'core.parsers.article_parsers.pipelines.PostgresPipeline': 450,
+            # 'core.parsers.article_parsers.pipelines.PostgresPipeline': 450,
             'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
@@ -36,4 +36,6 @@ class ScientificamericanParser(scrapy.Spider):
             'title': title,
             'content': content,
             'url': response.request.url,
+            'category': 'AI',
+            'resource': 'scientificamerican'
         }

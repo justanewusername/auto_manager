@@ -4,7 +4,9 @@ from scrapy.crawler import CrawlerProcess
 from core.parsers import MultiParser
 from core.schedule.schedule import Schedule
 import multiprocessing
+import threading
 import time
+from scrapy import cmdline
 import json
 from core.broker.broker_manager import BrokerManager
 import csv
@@ -19,17 +21,22 @@ def readCSV():
             objects.append(row)
     return objects
 
+
+def run_scrapy():
+    cmdline.execute("scrapy runspider ./core/parsers/article_parsers/venturebeat_parser.py".split())
+
 def run_parsers(site='all'):
     multiParser = MultiParser()
     multiParser.run(site=site)
 
 def callback(ch, method, properties, body):
     print("recived")
+    print(body)
     
     msg = json.loads(body)
-    if msg in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
-        run_parsers(msg)
-    else:    
+    if msg['resource'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
+        run_parsers()
+    else:
         run_parsers()
 
 def second_process():

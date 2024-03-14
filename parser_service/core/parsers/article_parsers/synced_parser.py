@@ -1,13 +1,13 @@
 import scrapy
 
 class SyncedParser(scrapy.Spider):
-    name = 'scientificamerican-scryper'
+    name = 'Synced'
     start_urls = ['https://syncedreview.com/category/popular/']
     custom_settings = {
         'ITEM_PIPELINES': {
             'core.parsers.article_parsers.pipelines.CleaningPipeline': 300,
             'core.parsers.article_parsers.pipelines.CsvExportPipeline': 400,
-            'core.parsers.article_parsers.pipelines.PostgresPipeline': 450,
+            # 'core.parsers.article_parsers.pipelines.PostgresPipeline': 450,
             'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
@@ -27,4 +27,6 @@ class SyncedParser(scrapy.Spider):
             'title': title,
             'content': content,
             'url': response.request.url,
+            'category': 'AI',
+            'resource': 'synced'
         }

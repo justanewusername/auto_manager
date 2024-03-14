@@ -39,10 +39,21 @@ services:
                 condition: service_healthy
         command: "poetry run uvicorn main:app --host 0.0.0.0 --port 81"
 
+    frontend:
+        container_name: frontend
+        build: ./frontend_service
+        volumes:
+          - frontend_node_modules:/app/frontend/node_modules
+        ports:
+          - 3000:3000
+        # stdin_open: true # разрешает ввод команд в контейнере
+        command: npm start
+
+
     # backend:
     #     container_name: backend
     #     build:
-    #         context: ./backend
+    #         context: ./backend 
     #         dockerfile: Dockerfile
     #     ports:
     #         - 8080:8080
@@ -79,8 +90,8 @@ services:
             interval: 5s
             timeout: 3s
             retries: 3
-        volumes:
-            - postgres_auto_manager:/var/lib/postgresql/data
+        # volumes:
+        #     - postgres_auto_manager:/var/lib/postgresql/data
 
     broker:
         container_name: broker
@@ -96,4 +107,5 @@ services:
             retries: 3
 
 volumes:
-    postgres_auto_manager:
+    frontend_node_modules:
+#     postgres_auto_manager:
