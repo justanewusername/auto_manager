@@ -10,4 +10,4 @@ The project is currently under development.
 ```poetry install```
 
 ### Run the project
-```run poetry python main.py```
+```poetry run python main.py```

@@ -1,0 +1,8 @@
+version: 0.1.0
+USER_AGENT: 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
+
+# database
+MYSQL_HOST: 'localhost'
+MYSQL_DATABASE: 'mydatabase'
+MYSQL_USER: 'root'
+MYSQL_PASSWORD: 'mypassword'

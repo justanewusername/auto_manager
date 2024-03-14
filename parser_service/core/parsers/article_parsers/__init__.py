@@ -1,0 +1,6 @@
+from core.parsers.article_parsers.scientificamerican_parser import ScientificamericanParser
+from core.parsers.article_parsers.MIT_parser import MITParser
+from core.parsers.article_parsers.extremetech import ExtremetechParser
+from core.parsers.article_parsers.synced_parser import SyncedParser
+from core.parsers.article_parsers.gizmodo_parser import GizmodoParser
+from core.parsers.article_parsers.venturebeat_parser import VenturebeatParser

@@ -1,1 +1,4 @@
 /.vscode
+/frontend_service/node_modules
+output.csv
+*.pyc

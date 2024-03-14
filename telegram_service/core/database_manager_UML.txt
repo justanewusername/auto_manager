@@ -1,0 +1,15 @@
+@startuml
+class DatabaseManager {
+    create_chat()
+    get_all_chat_id()
+    create_post()
+    get_post_by_id()
+    get_post_by_article()
+        engine
+    SessionLocal
+    Base
+    Post
+    Chat
+    __init__()
+}
+@enduml

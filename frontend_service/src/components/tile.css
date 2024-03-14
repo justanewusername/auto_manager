@@ -1,0 +1,21 @@
+.tile {
+    background-color: #EBDAFF;
+    position: relative;
+    height: fit-content;
+    border-radius: 0 0 5px 5px;
+    padding: 5px 10px;
+    margin: 8px 16px;
+    display: inline-block;
+    width: 500px;
+}
+
+.tile__button-red {
+    background-color: #FB4B4B;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
+.tile_source {
+    margin-left: 10px;
+}
