@@ -23,7 +23,7 @@ const PostsContainer = forwardRef((props, ref) => {
       .then(response => {
         response.data.forEach(x => console.log(x.resource));
 
-        if(props.url == "http://localhost:8811/favorites") {
+        if(props.url == "http://185.233.81.221:8811/favorites") {
           let temp = response.data
           temp = temp.filter(obj => obj['in_favorites'] === true)
           setPosts(temp);

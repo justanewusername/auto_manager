@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 function App() {
   const postContainerRef = useRef(null);
-  const [postContainerUrl, setPostContainerUrl] = useState("http://localhost:8811/all");
+  const [postContainerUrl, setPostContainerUrl] = useState("http://185.233.81.221:8811/all");
   const [resourcefilter, setResourcefilter] =  useState("all");
 
 
@@ -22,9 +22,9 @@ function App() {
 
   const changePage = (currentPage) => {
     if(currentPage === "main") {
-      setPostContainerUrl("http://localhost:8811/all")
+      setPostContainerUrl("http://185.233.81.221:8811/all")
     } else {
-      setPostContainerUrl("http://localhost:8811/favorites")
+      setPostContainerUrl("http://185.233.81.221:8811/favorites")
     }
   };
 

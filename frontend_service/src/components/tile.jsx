@@ -18,7 +18,7 @@ function Tile(props) {
     }, [props.in_favorite]);
 
     const deletePost = () => {
-        axios.post("http://localhost:8811/del", {"number": props.tileId})
+        axios.post("http://185.233.81.221:8811/del", {"number": props.tileId})
         .then(response => {
             handleDelete();
         })
@@ -37,7 +37,7 @@ function Tile(props) {
     }
 
     const addToFavorites = () => {
-        axios.post("http://localhost:8811/favorites/create/", {number: props.tileId})
+        axios.post("http://185.233.81.221:8811/favorites/create/", {number: props.tileId})
         .then(response => {
             setIsInFavorites(true)
         })
@@ -47,7 +47,7 @@ function Tile(props) {
     }
 
     const removeFromFavorites = () => {
-        axios.post("http://localhost:8811/favorites/del/", {number: props.tileId})
+        axios.post("http://185.233.81.221:8811/favorites/del/", {number: props.tileId})
         .then(response => {
             setIsInFavorites(false)
         })

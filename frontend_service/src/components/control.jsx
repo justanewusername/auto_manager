@@ -34,7 +34,7 @@ function Control({ changePage, onRefreshClick, setFilter }) {
     const postData = async () => {
         try {
           const response = await axios.post(
-            "http://localhost:8811/run",
+            "http://185.233.81.221:8811/run",
             {
               name: selectedResourceOption,
             }
@@ -92,7 +92,7 @@ function Control({ changePage, onRefreshClick, setFilter }) {
             </div>
 
             <div className="panel__right">
-                <a target="_blank" rel="noreferrer" href='http://localhost:8811/download/all'>Скачать файл</a>
+                <a target="_blank" rel="noreferrer" href='http://185.233.81.221:8811/download/all'>Скачать файл</a>
             </div>
         </div>
     );
