@@ -14,9 +14,9 @@ class DatabaseManager:
         class Posts(self.Base):
             __tablename__ = "posts"
             id = Column(Integer, primary_key=True)
-            article = Column(String(32000), unique=True)
+            article = Column(String(32000))
             title = Column(String, nullable=True)
-            url = Column(String, nullable=True)
+            url = Column(String, nullable=True, unique=True)
             category = Column(String, nullable=True)
             resource = Column(String, nullable=True)
 
