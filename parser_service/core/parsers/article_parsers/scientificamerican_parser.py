@@ -11,10 +11,15 @@ class ScientificamericanParser(scrapy.Spider):
             'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
+
+    def __init__(self, *args, **kwargs):
+        super(ScientificamericanParser, self).__init__(*args, **kwargs)
+        self.start_urls = kwargs.get('start_urls', ['https://www.scientificamerican.com/artificial-intelligence/'])
+        self.days = kwargs.get('days', 20)
     
     def parse(self, response):
         ARTICLE_TAG = 'article'
-        days_difference = self.settings.get('days_difference', 20)
+        days_difference = self.days
         
         max_articles_count = 5
 

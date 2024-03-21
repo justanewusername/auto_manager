@@ -1,6 +1,6 @@
 from scrapy.crawler import CrawlerProcess
 from bestconfig import Config
-from core.parsers.article_parsers import ScientificamericanParser, MITParser, ExtremetechParser, SyncedParser, GizmodoParser, VenturebeatParser
+from core.parsers.article_parsers import *
 from scrapy.utils.project import get_project_settings
 from scrapy.settings import Settings
 
@@ -10,22 +10,24 @@ class MultiParser:
         self.crawler_process = CrawlerProcess({
             'USER_AGENT': config['USER_AGENT']
         })
+
+        self.parsers = {
+            'Scientificamerican': ScientificamericanParser,
+            'MIT': MITParser,
+            'Extremetech': ExtremetechParser,
+            'Venturebeat': VenturebeatParser,
+            'Gizmodo': GizmodoParser,
+            'Synced': ExtremetechParser
+        }
     
-    def run(self, site='all'):
+    def run(self, site='all', days : int = 14) -> None:
         if site == 'all':
-            self.crawler_process.crawl(ScientificamericanParser)
-            self.crawler_process.crawl(MITParser)
-            self.crawler_process.crawl(ExtremetechParser)
-            self.crawler_process.crawl(VenturebeatParser)
-            self.crawler_process.crawl(GizmodoParser, 
-                                       start_urls=['https://gizmodo.com/tech/artificial-intelligence'], 
-                                       days=14)
-            self.crawler_process.start()
-        elif site == 'Scientificamerican':
-            self.crawler_process.crawl(ScientificamericanParser)
-        elif site == 'MIT':
-            self.crawler_process.crawl(MITParser)
-        elif site == 'Extremetech':
-            self.crawler_process.crawl(ExtremetechParser)
-        elif site == 'Synced':
-            self.crawler_process.crawl(ExtremetechParser)
+            for parser in self.parsers:
+                self.crawler_process.crawl(parser, days=days)
+        else:
+            self.crawler_process.crawl(self.parsers[site], days=days)
+        self.crawler_process.start()
+
+    def run_title_parser(self, resource: str) -> None:
+        self.crawler_process.crawl(UniversalTitleParser,
+                                   start_urls=[resource])

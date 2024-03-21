@@ -22,13 +22,6 @@ def callback(ch, method, properties, body):
     db_manager.create_post(post, msg['title'], msg['url'], msg['category'], msg['resource'])
     print('post saved.')
 
-    # send post
-    # queue = msg['destination'] #'posts'
-    # br = BrokerManager(queue, 'broker')
-    # msg = json.dumps({'content': post, 'url': msg['url']})
-    # br.send_msg(msg)
-    # br.close()
-
 
 queue_name = 'articles'
 broker = BrokerManager(queue_name, 'broker')

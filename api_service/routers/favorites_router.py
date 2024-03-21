@@ -1,10 +1,6 @@
-from typing import Union
-from broker_manager import BrokerManager
 from pydantic import BaseModel
 from database_manager import DatabaseManager
-from fastapi.middleware.cors import CORSMiddleware
-
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import status, HTTPException
 from fastapi import APIRouter
 
 
@@ -14,16 +10,16 @@ class Item(BaseModel):
 class ItemNumber(BaseModel):
     number: int
 
-router = APIRouter()
+router = APIRouter(prefix="/favorites")
 
-@router.get("/favorites/")
-def get_all_favorites():
+@router.get("/")
+async def get_all_favorites():
     databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
     result = databaseManager.get_all_posts()
     return result
 
 
-@router.post("/favorites/create/")
+@router.post("/create")
 async def create_item(item: ItemNumber):
     try:
         databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
@@ -33,7 +29,7 @@ async def create_item(item: ItemNumber):
     return result
 
 
-@router.post("/favorites/del/")
+@router.post("/del")
 async def create_item(item: ItemNumber):
     try:
         databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")

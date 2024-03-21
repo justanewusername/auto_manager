@@ -12,11 +12,16 @@ class MITParser(scrapy.Spider):
             'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
+
+    def __init__(self, *args, **kwargs):
+        super(MITParser, self).__init__(*args, **kwargs)
+        self.start_urls = kwargs.get('start_urls', ['https://news.mit.edu/topic/artificial-intelligence2/'])
+        self.days = kwargs.get('days', 14)
     
     def parse(self, response):
         articles = response.css('.page-term--views--list')
         ARTICLE_TAG = 'article'
-        days_difference = self.settings.get('days_difference', 20)
+        days_difference = self.days
         
         for article in articles.css(ARTICLE_TAG):
             article_url = article.css('h3 a').attrib['href']

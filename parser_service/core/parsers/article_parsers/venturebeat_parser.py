@@ -12,11 +12,16 @@ class VenturebeatParser(scrapy.Spider):
             'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
+
+    def __init__(self, *args, **kwargs):
+        super(VenturebeatParser, self).__init__(*args, **kwargs)
+        self.start_urls = kwargs.get('start_urls', ['https://venturebeat.com/category/ai/'])
+        self.days = kwargs.get('days', 20)
     
     def parse(self, response):
         articles = response.css('.MainBlock')
         ARTICLE_TAG = 'article'
-        days_difference = self.settings.get('days_difference', 20)
+        days_difference = self.days
         
         for article in articles.css(ARTICLE_TAG):
             article_url = article.css('h2 a').attrib['href']

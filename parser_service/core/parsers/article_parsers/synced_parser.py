@@ -11,6 +11,11 @@ class SyncedParser(scrapy.Spider):
             'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
+
+    def __init__(self, *args, **kwargs):
+        super(SyncedParser, self).__init__(*args, **kwargs)
+        self.start_urls = kwargs.get('start_urls', ['https://syncedreview.com/category/popular/'])
+        self.days = kwargs.get('days', 14)
     
     def parse(self, response):
         ARTICLE_TAG = 'article'

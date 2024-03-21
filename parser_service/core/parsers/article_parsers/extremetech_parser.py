@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 class ExtremetechParser(scrapy.Spider):
     name = 'scientificamerican-scryper'
-    start_urls = ['https://www.extremetech.com/tag/artificial-intelligence/page/2']
+    start_urls = ['https://www.extremetech.com/tag/artificial-intelligence']
     custom_settings = {
         'ITEM_PIPELINES': {
             'core.parsers.article_parsers.pipelines.CleaningPipeline': 300,
@@ -13,11 +13,17 @@ class ExtremetechParser(scrapy.Spider):
             'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
         },
     }
+
+    def __init__(self, *args, **kwargs):
+        super(ExtremetechParser, self).__init__(*args, **kwargs)
+        self.start_urls = kwargs.get('start_urls', ['https://www.extremetech.com/tag/artificial-intelligence'])
+        self.days = kwargs.get('days', 14)
     
     def parse(self, response):
         articles = response.css('main section section')
         ARTICLE_TAG = '.item.flex.mt-4'
-        days_difference = self.settings.get('days_difference', 15)
+        days_difference = self.days
+        
         for article in articles.css(ARTICLE_TAG):
             article_url = article.css('a').attrib['href']
             article_date = article.css('time ::attr(datetime)').get()
