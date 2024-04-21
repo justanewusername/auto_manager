@@ -6,10 +6,7 @@ class UniversalTitleParser(scrapy.Spider):
     start_urls = ['https://gizmodo.com/tech/artificial-intelligence']
     custom_settings = {
         'ITEM_PIPELINES': {
-            'core.parsers.article_parsers.pipelines.CleaningPipeline': 300,
-            'core.parsers.article_parsers.pipelines.CsvExportPipeline': 400,
-            # 'core.parsers.article_parsers.pipelines.PostgresPipeline': 450,
-            'core.parsers.article_parsers.pipelines.BrokerPipeline': 500,
+            'core.parsers.article_parsers.pipelines.RequestSenderPipeline': 300,
         },
     }
 

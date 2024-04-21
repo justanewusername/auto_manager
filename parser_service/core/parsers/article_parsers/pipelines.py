@@ -7,6 +7,7 @@ import json
 from bs4 import BeautifulSoup
 from core.broker.broker_manager import BrokerManager
 import tiktoken
+import requests
 
 
 class CleaningPipeline:
@@ -44,9 +45,15 @@ class BrokerPipeline:
                               'category': item['category'],
                               'resource': item['resource']})
             broker.send_msg(msg)
-            # broker.channel.basic_publish(exchange='', routing_key=queue_name, body=msg)
-            # broker.connection.close()
             broker.close()
+        return item
+
+
+class RequestSenderPipeline:
+    def process_item(self, item, spider):
+        url = 'http://localhost:8811/posts/titles' # http://185.233.81.221:8811/posts/titles
+        if 'title' in item:
+            requests.post(url, json = item)
         return item
 
 

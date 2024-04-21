@@ -74,7 +74,7 @@ async def create_item(item: Item):
     return result
 
 
-@router.post("/run/")
+@router.post("/run")
 async def create_item(item: Item):
     queue_name = 'apiparser'
     broker = BrokerManager(queue_name, 'broker')
@@ -84,13 +84,18 @@ async def create_item(item: Item):
     return item.name
 
 
-@router.get("/resource/titles")
-def get_(resource: str):
+@router.get("/posts/titles")
+def get_titles(resource: str):
     queue_name = 'apiparser'
     broker = BrokerManager(queue_name, 'broker')
     msg = json.dumps({'type': "titles", 'resource': resource})
     broker.send_msg(msg)
     broker.close()
+    return
+
+@router.post("/posts/titles")
+async def set_titles(titles: list):
+    send_message(titles)
     return
 
 # websockets
@@ -100,7 +105,7 @@ async def send_message(message):
     if connected_websockets:
         await asyncio.wait([ws.send(message) for ws in connected_websockets])
 
-@router.websocket("/post/ws")
+@router.websocket("/posts/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     connected_websockets.add(websocket)
