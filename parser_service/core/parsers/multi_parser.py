@@ -12,22 +12,23 @@ class MultiParser:
         })
 
         self.parsers = {
-            'Scientificamerican': ScientificamericanParser,
+            'SCIENTIFICAMERICAN': ScientificamericanParser,
             'MIT': MITParser,
-            'Extremetech': ExtremetechParser,
-            'Venturebeat': VenturebeatParser,
-            'Gizmodo': GizmodoParser,
-            'Synced': ExtremetechParser
+            'EXTREMETECH': ExtremetechParser,
+            'VENTUREBEAT': VenturebeatParser,
+            'GIZMODO': GizmodoParser,
+            'SYNCED': ExtremetechParser,
         }
     
-    def run(self, site='all', days : int = 14) -> None:
-        if site == 'all':
+    def run(self, site='ALL', days : int = 14) -> None:
+        if site.upper() == 'ALL':
             for parser in self.parsers:
                 self.crawler_process.crawl(parser, days=days)
         else:
-            self.crawler_process.crawl(self.parsers[site], days=days)
+            self.crawler_process.crawl(self.parsers[site.upper()], days=days)
         self.crawler_process.start()
 
     def run_title_parser(self, resource: str) -> None:
         self.crawler_process.crawl(UniversalTitleParser,
                                    start_urls=[resource])
+        self.crawler_process.start()

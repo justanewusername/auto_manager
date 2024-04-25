@@ -5,53 +5,44 @@ import json
 from core.broker.broker_manager import BrokerManager
 import csv
 
-def readCSV() -> list[any]:
-    objects = []
-    encoding = 'utf-8'
+class Main:
+    def __init__(self) -> None:
+        config = Config()
+        # self.second_process()
+        ##############################
+        multi_parser = MultiParser()
+        multi_parser.run_title_parser('https://www.datanami.com/')
 
-    with open('output.csv', 'r', newline='', encoding=encoding) as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            objects.append(row)
-    return objects
+    def readCSV(self) -> list[any]:
+        objects = []
+        encoding = 'utf-8'
 
+        with open('output.csv', 'r', newline='', encoding=encoding) as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+            for row in csv_reader:
+                objects.append(row)
+        return objects
 
-def run_scrapy() -> None:
-    cmdline.execute("scrapy runspider ./core/parsers/article_parsers/venturebeat_parser.py".split())
+    def callback(self, ch, method, properties, body):
+        multi_parser = MultiParser()
+        msg = json.loads(body)
 
-def run_parsers(site : str ='all') -> None:
-    multiParser = MultiParser()
-    multiParser.run(site=site)
+        if msg['type'] == 'titles':
+            multi_parser.run_title_parser(resource=msg['resource'])
 
-def run_title_parser(resource: str) -> None:
-    multi_parser = MultiParser()
-    multi_parser.run_title_parser(resource=resource)
+        if msg['resource'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
+            multi_parser.run(site=msg['resource'])
+        else:
+            multi_parser.run()
 
-def callback(ch, method, properties, body):
-    msg = json.loads(body)
+    def second_process(self) -> None:
+        queue_name = 'apiparser'
+        broker = BrokerManager(queue_name, 'broker')
+        broker.set_callback(self.callback)
 
-    if msg['type'] == 'titles':
-        run_title_parser(msg['resource'])
-
-    if msg['resource'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
-        run_parsers(msg['resource'])
-    else:
-        run_parsers()
-
-def second_process() -> None:
-    queue_name = 'apiparser'
-    broker = BrokerManager(queue_name, 'broker')
-    broker.set_callback(callback)
-
-    print(' [*] Waiting for messages.')
-    broker.channel.start_consuming()
-
-def main() -> None:
-    config = Config()
-    print(config['version'])
-    
-    second_process()
+        print(' [*] Waiting for messages.')
+        broker.channel.start_consuming()
 
 
 if __name__ == "__main__":
-    main()
+    Main()

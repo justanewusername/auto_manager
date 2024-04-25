@@ -1,3 +1,5 @@
+import resource
+from matplotlib import category
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -17,9 +19,36 @@ class DatabaseManager:
             title = Column(String, nullable=True)
             url = Column(String, nullable=True)
 
+        class Titles(self.Base):
+            __tablename__ = "titles"
+            id = Column(Integer, primary_key=True)
+            title = Column(String, nullable=False)
+            url = Column(String, nullable=False)
+            category = Column(String, nullable=False)
+            resource = Column(String, nullable=False)
+            last_update = Column(String, nullable=True)
+        
         self.Post = Posts
+        self.Title = Titles
         self.Base.metadata.create_all(bind=self.engine)
 
+    # TITLES
+    def create_title(self, title: str, url: str, category: str, resource: str, last_update: str):
+        session = self.SessionLocal()
+        new_title = self.Title(title=title, url=url, category=category, resource=resource, last_update=last_update)
+        session.add(new_title)
+        
+        session.flush()
+        session.refresh(new_title)
+
+        session.expunge_all()
+        session.commit()
+        session.close()
+        
+        return {"id": new_title.id}
+
+
+    # POSTS
     def create_post(self, article: str, title: str, url: str):
         session = self.SessionLocal()
         new_post = self.Post(article=article, title=title, url=url)

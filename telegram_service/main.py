@@ -11,7 +11,6 @@ import pika
 from asyncio import new_event_loop, set_event_loop
 from core.database_manager import DatabaseManager
 
-print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 # Настройки телеграм-бота
 config = Config()
 API_TOKEN = str(config['API_TOKEN'])
