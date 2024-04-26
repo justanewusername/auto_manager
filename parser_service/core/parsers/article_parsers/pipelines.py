@@ -1,7 +1,6 @@
 import csv
 from bestconfig import Config
 from scrapy.exporters import CsvItemExporter
-import mysql.connector
 from core.database_manager import DatabaseManager
 import json
 from bs4 import BeautifulSoup

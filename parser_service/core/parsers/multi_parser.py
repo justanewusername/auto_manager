@@ -32,3 +32,8 @@ class MultiParser:
         self.crawler_process.crawl(UniversalTitleParser,
                                    start_urls=[resource])
         self.crawler_process.start()
+
+    def run_article_parser(self, resource: str) -> None:
+        self.crawler_process.crawl(UniversalArticleParser,
+                                   start_urls=[resource])
+        self.crawler_process.start()

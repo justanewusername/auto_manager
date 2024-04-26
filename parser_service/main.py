@@ -11,7 +11,8 @@ class Main:
         # self.second_process()
         ##############################
         multi_parser = MultiParser()
-        multi_parser.run_title_parser('https://www.datanami.com/')
+        # multi_parser.run_title_parser('https://www.datanami.com/')
+        multi_parser.run_article_parser('https://dataconomy.com/2024/04/19/llama-3-benchmark-meta-ai-vs-chatgpt-vs-gemini/')
 
     def readCSV(self) -> list[any]:
         objects = []
