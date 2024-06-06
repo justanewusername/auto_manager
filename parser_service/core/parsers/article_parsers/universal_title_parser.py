@@ -3,18 +3,19 @@ import scrapy
 from datetime import datetime
 from dateutil import parser
 from urllib.parse import urlparse
+import requests
 
 class UniversalTitleParser(scrapy.Spider):
     name = 'Universal title Parser'
     start_urls = ['https://gizmodo.com/tech/artificial-intelligence']
-    # custom_settings = {
-    #     'ITEM_PIPELINES': {
-    #         # 'core.parsers.article_parsers.pipelines.RequestSenderPipeline': 300,
-    #     },
-    # }
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'core.parsers.article_parsers.pipelines.TitlePostgresPipeline': 300,
+        },
+    }
+
 
     def __init__(self, *args, **kwargs):
-        print('00000000000')
         super(UniversalTitleParser, self).__init__(*args, **kwargs)
         self.start_urls = kwargs.get('start_urls', ['https://gizmodo.com/tech/artificial-intelligence'])
         self.days = kwargs.get('days', 14)
@@ -23,12 +24,13 @@ class UniversalTitleParser(scrapy.Spider):
 
     
     def parse(self, response):
-        print('woooooooooooooow')
         ARTICLE_TAG = 'article'
         days_difference = self.days
 
         articles = response.css(ARTICLE_TAG)
-        print("ARTICLE COUNT:", len(articles))
+
+        current_article_index = 1
+
         if len(articles) == 0:
             articles = response.css('li')
         
@@ -37,6 +39,9 @@ class UniversalTitleParser(scrapy.Spider):
             yield ''
 
         for article in articles:
+            self.send_progress(response=response, articles_count=len(articles), 
+                               current_article_index=current_article_index)
+
             right_title_pattern = self.find_right_title_pattern(article=article)
             title = article.css(right_title_pattern).extract()
             title = max(title, key=len)
@@ -54,8 +59,8 @@ class UniversalTitleParser(scrapy.Spider):
             url = self.find_right_url_pattern(article)
 
             url = self.process_url(url, response.url)
-            
-            print('77777777')
+
+            current_article_index += 1
             yield {
                 'title': title,
                 'url': url,
@@ -84,40 +89,25 @@ class UniversalTitleParser(scrapy.Spider):
         title_tags = ['h2', 'h3', 'h4']
         result = ''
         for title_tag in title_tags:
-            print('111')
             if len(article.css(title_tag)) != 0:
-                print('222')
                 if len(article.css(title_tag + ' a')) != 0:
-                    print('333')
                     result = article.css(title_tag + ' a').attrib['href']
                     break
                 parent_element = article.xpath('.//' + title_tag + '/..')
-                print('444')
-                print(parent_element)
                 if len(parent_element.css('a')) == 0:
-                    print('555')
                     parent_element = article.xpath('.//' + title_tag + '/../..')
                     if len(parent_element.css('a')) == 0:
-                        print('666')
                         result = article.css('a').attrib['href']
                         break
                     else:
-                        print('777')
                         result = parent_element.css('a').attrib['href']
                         break
                 else:
-                    print('888')
-                    print(parent_element.css('a').attrib['href'])
                     result = parent_element.css('a').attrib['href']
                     break
         if result == '':
-            print('999')
             result = article.css('a').attrib['href']
-        print('AAA ' + result)
         return result
-
-    def find_right_article_pattern(self):
-        pass
 
 
     def proccess_title(self, title: str):
@@ -125,6 +115,7 @@ class UniversalTitleParser(scrapy.Spider):
         title = title.strip()
         return title
     
+
     def process_url(self, url: str, response_url: str):
         parsed_url = urlparse(response_url)
         base_url = parsed_url.scheme + "://" + parsed_url.netloc
@@ -133,3 +124,23 @@ class UniversalTitleParser(scrapy.Spider):
                 url = '/' + url
             url = base_url + url
         return url
+    
+
+    def send_progress(self, response, articles_count, current_article_index):
+        url_count = len(self.start_urls)
+
+        self.process_item(current_article_index=str(current_article_index),
+                          article_count=str(articles_count),
+                          current_url_index=str(self.start_urls.index(response.url) + 1),
+                          url_count=str(len(self.start_urls)))
+
+
+    def process_item(self, current_url_index: str, url_count: str, current_article_index: str, article_count: str):
+        url = 'http://localhost:8811/posts/sendprogress' # http://185.233.81.221:8811/posts/sendprogress
+        data = {
+            'current_url_index': current_url_index,
+            'url_count': url_count,
+            'current_article_index': current_article_index,
+            'article_count': article_count,
+        }
+        requests.post(url, json = data)

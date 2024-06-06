@@ -47,3 +47,15 @@
     color: black;
     background-color: #6db1e4;
 }
+
+.button-login, .button-signin {
+    text-decoration: none;
+}
+
+.button-login:hover, .button-signin:hover {
+    cursor: pointer;
+}
+
+.button-login {
+    color: var(--pink-color)
+}

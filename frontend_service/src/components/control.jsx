@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import './control.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import config from "../config,js";
 
 function Control({ changePage, onRefreshClick, setFilter }) {
     const [selectedResourceOption, setSelectedResourceOption] = useState("all");
@@ -34,7 +35,7 @@ function Control({ changePage, onRefreshClick, setFilter }) {
     const postData = async () => {
         try {
           const response = await axios.post(
-            "http://localhost:8811/run",
+            config.apiUrl + '/run',
             {
               name: selectedResourceOption,
             }
@@ -58,15 +59,15 @@ function Control({ changePage, onRefreshClick, setFilter }) {
     return (
         <div className="control">
             <div className="panel__left">
-                <button onClick={onMainPageSet}>Главная</button>
-                <button onClick={onFavoritesPageSet}>Избранное</button>
+                <button className="button-primary" onClick={onMainPageSet}>Главная</button>
+                <button className="button-primary" onClick={onFavoritesPageSet}>Избранное</button>
                 {/* <Link className="link__button" to="/">Главная</Link>
                 <Link className="link__button" to="/favorites">Избранное</Link> */}
             </div>
 
 
             <div className="panel__center">
-                <button onClick={onRefreshClick} >Обновить</button>
+                <button className="button-primary" onClick={onRefreshClick} >Обновить</button>
                 <div className="panel__list">
                     <p>Выбрать категорию</p>
                     <select value={selectedTypeOption} onChange={handleTypeOptionChange}>
@@ -87,12 +88,14 @@ function Control({ changePage, onRefreshClick, setFilter }) {
                         ))}
                     </select>
                 </div>
-                <button onClick={applyFilters}>Применить</button>
-                <button onClick={postData}>Запустить парсер</button>
+                <button className="button-primary" onClick={applyFilters}>Применить</button>
+                <button className="button-primary" onClick={postData}>Запустить парсер</button>
+                <div className="button-login" onClick={applyFilters}>Log In</div>
+                <div className="button-signin" onClick={applyFilters}>Sign In</div>
             </div>
 
             <div className="panel__right">
-                <a target="_blank" rel="noreferrer" href='http://localhost:8811/download/all'>Скачать файл</a>
+                <a target="_blank" rel="noreferrer" href={config.apiUrl + '/download/all'}>Скачать файл</a>
             </div>
         </div>
     );

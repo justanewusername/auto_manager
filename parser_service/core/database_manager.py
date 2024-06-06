@@ -3,6 +3,7 @@ from matplotlib import category
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
 
 class DatabaseManager:
@@ -18,40 +19,63 @@ class DatabaseManager:
             article = Column(String, unique=True)
             title = Column(String, nullable=True)
             url = Column(String, nullable=True)
-
-        class Titles(self.Base):
-            __tablename__ = "titles"
-            id = Column(Integer, primary_key=True)
-            title = Column(String, nullable=False)
-            url = Column(String, nullable=False)
-            category = Column(String, nullable=False)
-            resource = Column(String, nullable=False)
+            category = Column(String, nullable=True)
+            resource = Column(String, nullable=True)
             last_update = Column(String, nullable=True)
+
+        # class Titles(self.Base):
+        #     __tablename__ = "titles"
+        #     id = Column(Integer, primary_key=True)
+        #     title = Column(String, nullable=False)
+        #     url = Column(String, nullable=False)
+        #     category = Column(String, nullable=False)
+        #     resource = Column(String, nullable=False)
+        #     last_update = Column(String, nullable=True)
         
         self.Post = Posts
-        self.Title = Titles
+        # self.Title = Titles
         self.Base.metadata.create_all(bind=self.engine)
 
-    # TITLES
-    def create_title(self, title: str, url: str, category: str, resource: str, last_update: str):
-        session = self.SessionLocal()
-        new_title = self.Title(title=title, url=url, category=category, resource=resource, last_update=last_update)
-        session.add(new_title)
+    # # TITLES
+    # def create_title(self, title: str, url: str, category: str, resource: str, last_update: str):
+    #     session = self.SessionLocal()
+    #     new_title = self.Title(title=title, url=url, category=category, resource=resource, last_update=last_update)
+    #     session.add(new_title)
         
-        session.flush()
-        session.refresh(new_title)
+    #     session.flush()
+    #     session.refresh(new_title)
 
-        session.expunge_all()
-        session.commit()
-        session.close()
+    #     session.expunge_all()
+    #     session.commit()
+    #     session.close()
         
-        return {"id": new_title.id}
+    #     return {"id": new_title.id}
 
 
     # POSTS
     def create_post(self, article: str, title: str, url: str):
         session = self.SessionLocal()
         new_post = self.Post(article=article, title=title, url=url)
+        session.add(new_post)
+        
+        session.flush()
+        session.refresh(new_post)
+
+        session.expunge_all()
+        session.commit()
+        session.close()
+        
+        return {"id": new_post.id}
+    
+    def creat_post(self, title: str, url: str):
+        today = datetime.today()
+        # Форматируем дату в строку с помощью strftime()
+        formatted_date = today.strftime('%d.%m.%Y')
+
+        session = self.SessionLocal()
+        new_post = self.Post(title=title,
+                             url=url,
+                             last_update=formatted_date)
         session.add(new_post)
         
         session.flush()

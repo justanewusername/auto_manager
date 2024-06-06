@@ -33,7 +33,6 @@ class BrokerPipeline:
         if 'content' in item:
             soup = BeautifulSoup(item['content'], 'html.parser')
             if soup.find(True):
-                print("найден тэг")
                 return ""
             queue_name = 'articles'
             broker = BrokerManager(queue_name, 'broker')
@@ -80,10 +79,22 @@ class PostgresPipeline:
         self.db_manager.create_post(article=item['content'], title=item['title'], url=item['url'])
         return item
     
+
 class TitlePostgresPipeline:
     def __init__(self):
         self.db_manager = DatabaseManager('postgresql://user:qwerty@db:5432/mydbname')
 
     def process_item(self, item, spider):
-        self.db_manager.create_post(article=item['content'], title=item['title'], url=item['url'])
+        self.db_manager.create_post(title=item['title'], url=item['url'])
         return item
+
+
+# class TitlePostgresPipeline:
+#     def __init__(self):
+#         self.db_manager = DatabaseManager('postgresql://user:qwerty@db:5432/mydbname')
+
+#     def process_item(self, item, spider):
+#         self.db_manager.create_title(title=item['title'], url=item['url'],
+#                                      category=item['category'], resource=item['resource'],
+#                                      last_update=item['last_update'])
+#         return item

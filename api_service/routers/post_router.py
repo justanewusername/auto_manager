@@ -8,15 +8,22 @@ import websockets
 import asyncio
 import json
 import io
+from schemas import *
 
 
 router = APIRouter()
 
-class Item(BaseModel):
-    name: str
+# class Item(BaseModel):
+#     name: str
 
-class ItemNumber(BaseModel):
-    number: int
+# class ItemNumber(BaseModel):
+#     number: int
+
+# class Resources(BaseModel):
+#     res: list[str]
+
+# class Urls(BaseModel):
+#     urls: list[str]
 
 @router.get("/download/all/")
 async def download_all_posts():
@@ -93,11 +100,6 @@ def get_titles(resource: str):
     broker.close()
     return
 
-@router.post("/posts/titles")
-async def set_titles(titles: list):
-    send_message(titles)
-    return
-
 # websockets
 connected_websockets = set()
 
@@ -105,7 +107,7 @@ async def send_message(message):
     if connected_websockets:
         await asyncio.wait([ws.send(message) for ws in connected_websockets])
 
-@router.websocket("/posts/ws")
+@router.websocket("/posts/progress/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     connected_websockets.add(websocket)
@@ -116,3 +118,52 @@ async def websocket_endpoint(websocket: WebSocket):
             await send_message(data)
     except websockets.exceptions.ConnectionClosedError:
         connected_websockets.remove(websocket)
+
+################
+@router.get("/posts/titles")
+async def parse_titles():
+    db = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+    posts = db.get_all_posts()
+    return posts
+
+@router.post("/posts/titles")
+async def parse_titles(resources: Resources, urls: Urls, period_days: int):
+    parsers = {
+        'SCIENTIFICAMERICAN': 'https://www.scientificamerican.com/artificial-intelligence/',
+        'MIT': 'https://news.mit.edu/topic/artificial-intelligence2',
+        'EXTREMETECH': 'https://www.extremetech.com/tag/artificial-intelligence',
+        'VENTUREBEAT': 'https://venturebeat.com/category/ai/',
+        'GIZMODO': 'https://gizmodo.com/moderna-ceo-chatgpt-employees-vaccines-openai-1851435620',
+        'SYNCED': 'https://syncedreview.com/category/popular/',
+    }
+
+    processed_urls = []
+
+    for item in resources:
+        if item in parsers:
+            processed_urls.append(parsers[item])
+
+    for item in urls:
+        processed_urls.append(item)
+
+    queue_name = 'apiparser'
+    broker = BrokerManager(queue_name, 'broker')
+    msg = json.dumps({'type': 'titles',
+                      'resources': processed_urls, 
+                      'period_days': period_days
+                    })
+    
+    broker.send_msg(msg)
+    broker.close()
+    return item.name
+
+
+@router.post("/posts/sendprogress")
+async def send_progress(item):
+    print(item)
+
+
+            # 'current_url_index': current_url_index,
+            # 'url_count': url_count,
+            # 'current_article_index': current_article_index,
+            # 'article_count': article_count,

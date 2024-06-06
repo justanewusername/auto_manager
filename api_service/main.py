@@ -1,5 +1,5 @@
 from fastapi.middleware.cors import CORSMiddleware
-from routers import favorites_router, post_router
+from routers import favorites_router, post_router, auth_router
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -16,3 +16,4 @@ app.add_middleware(
 
 app.include_router(favorites_router.router)
 app.include_router(post_router.router)
+app.include_router(auth_router.router)

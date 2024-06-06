@@ -11,8 +11,9 @@ class Main:
         # self.second_process()
         ##############################
         multi_parser = MultiParser()
-        # multi_parser.run_title_parser('https://www.datanami.com/')
-        multi_parser.run_article_parser('https://dataconomy.com/2024/04/19/llama-3-benchmark-meta-ai-vs-chatgpt-vs-gemini/')
+        multi_parser.run_title_parser(['https://gizmodo.com/tech/artificial-intelligence',
+                                       'https://syncedreview.com/category/popular/'])
+        # multi_parser.run_article_parser('https://www.scientificamerican.com/article/stanford-ai-index-rapid-progress/')
 
     def readCSV(self) -> list[any]:
         objects = []
@@ -29,7 +30,7 @@ class Main:
         msg = json.loads(body)
 
         if msg['type'] == 'titles':
-            multi_parser.run_title_parser(resource=msg['resource'])
+            multi_parser.run_title_parser(resources=msg['resources'])
 
         if msg['resource'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
             multi_parser.run(site=msg['resource'])

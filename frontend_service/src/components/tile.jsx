@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react";
 import './tile.css'
 import axios from "axios";
+import config from "../config,js";
 
 function Tile(props) {
     console.log("hello", props.in_favorite)
@@ -18,7 +19,7 @@ function Tile(props) {
     }, [props.in_favorite]);
 
     const deletePost = () => {
-        axios.post("http://localhost:8811/del", {"number": props.tileId})
+        axios.post(config.apiUrl + "/del", {"number": props.tileId})
         .then(response => {
             handleDelete();
         })
@@ -37,7 +38,7 @@ function Tile(props) {
     }
 
     const addToFavorites = () => {
-        axios.post("http://localhost:8811/favorites/create/", {number: props.tileId})
+        axios.post(config.apiUrl + "/favorites/create/", {number: props.tileId})
         .then(response => {
             setIsInFavorites(true)
         })
@@ -47,7 +48,7 @@ function Tile(props) {
     }
 
     const removeFromFavorites = () => {
-        axios.post("http://localhost:8811/favorites/del/", {number: props.tileId})
+        axios.post(config.apiUrl + "/favorites/del/", {number: props.tileId})
         .then(response => {
             setIsInFavorites(false)
         })

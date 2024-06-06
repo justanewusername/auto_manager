@@ -19,6 +19,12 @@ class DatabaseManager:
             category = Column(String, nullable=True)
             resource = Column(String, nullable=True)
 
+        class Users(self.Base):
+            __tablename__ = "users"
+            id = Column(Integer, primary_key=True)
+            email = Column(String, nullable=False)
+            password = Column(String, nullable=False)
+
         class Favorites(self.Base):
             __tablename__ = "favorites"
             id = Column(Integer, primary_key=True)
@@ -30,6 +36,7 @@ class DatabaseManager:
 
         self.Post = Posts
         self.Favorites = Favorites
+        self.Users = Users
         self.Base.metadata.create_all(bind=self.engine)
 
     def create_post(self, article: str):
@@ -179,3 +186,39 @@ class DatabaseManager:
             posts_list.append(dict_item)
 
         return posts_list
+    
+
+####### AUTH
+
+    def create_user(self, email: str, password: str):
+        session = self.SessionLocal()
+        new_user = self.Users(password = password, email = email)
+        session.add(new_user)
+        
+        session.flush()
+        session.refresh(new_user)
+
+        session.expunge_all()
+        session.commit()
+        session.close()
+        
+        return {"id": new_user.id}
+    
+
+    def get_user_by_id(self, user_id: int):
+        session = self.SessionLocal()
+        user = session.query(self.Users).filter(self.Users.id == user_id).first()
+        session.expunge_all()
+        session.close()
+        if user is None:
+            return None
+        return user
+
+    def get_user_by_email(self, user_email: str):
+        session = self.SessionLocal()
+        user = session.query(self.Users).filter(self.Users.email == user_email).first()
+        session.expunge_all()
+        session.close()
+        if user is None:
+            return None
+        return user

@@ -2,6 +2,7 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from "rea
 import Tile from "./tile";
 import './postContainer.css';
 import axios from "axios";
+import config from "../config,js";
 
 const PostsContainer = forwardRef((props, ref) => {
     const [posts, setPosts] = useState([]);
@@ -23,7 +24,7 @@ const PostsContainer = forwardRef((props, ref) => {
       .then(response => {
         response.data.forEach(x => console.log(x.resource));
 
-        if(props.url == "http://localhost:8811/favorites") {
+        if(props.url == config.apiUrl + "/favorites") {
           let temp = response.data
           temp = temp.filter(obj => obj['in_favorites'] === true)
           setPosts(temp);
@@ -47,7 +48,6 @@ const PostsContainer = forwardRef((props, ref) => {
       };
 
     useEffect(() => {
-      console.log("ede")
         // Fetch posts from the external API
         getPosts()
     }, [props.url]);

@@ -20,6 +20,7 @@ class MultiParser:
             'SYNCED': ExtremetechParser,
         }
     
+
     def run(self, site='ALL', days : int = 14) -> None:
         if site.upper() == 'ALL':
             for parser in self.parsers:
@@ -28,10 +29,12 @@ class MultiParser:
             self.crawler_process.crawl(self.parsers[site.upper()], days=days)
         self.crawler_process.start()
 
-    def run_title_parser(self, resource: str) -> None:
+
+    def run_title_parser(self, resources: list[str]) -> None:
         self.crawler_process.crawl(UniversalTitleParser,
-                                   start_urls=[resource])
+                                   start_urls=resources)
         self.crawler_process.start()
+
 
     def run_article_parser(self, resource: str) -> None:
         self.crawler_process.crawl(UniversalArticleParser,
