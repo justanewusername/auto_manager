@@ -7,6 +7,7 @@ import csv
 
 class Main:
     def __init__(self) -> None:
+        print('STARTING!!!')
         config = Config()
         # self.second_process()
         ##############################
@@ -26,10 +27,13 @@ class Main:
         return objects
 
     def callback(self, ch, method, properties, body):
+        print('RECIVED')
+        
         multi_parser = MultiParser()
         msg = json.loads(body)
 
         if msg['type'] == 'titles':
+            print('TITLES!!!')
             multi_parser.run_title_parser(resources=msg['resources'])
 
         if msg['resource'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:

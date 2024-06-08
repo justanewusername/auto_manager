@@ -8,14 +8,19 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import NotFound from './components/notFound';
 import SignUp from './components/signup';
 import LogIn from './components/login';
-import config from './config,js';
+import config from './config.js';
 
 
 
 function App() {
   const postContainerRef = useRef(null);
-  const [postContainerUrl, setPostContainerUrl] = useState(config.apiUrl + "/all");
+  const [postContainerUrl, setPostContainerUrl] = useState(config.apiUrl + "/posts/titles");
   const [resourcefilter, setResourcefilter] =  useState("all");
+
+  console.log("one");
+  console.log(postContainerUrl);
+  console.log("two");
+  console.log(config.apiUrl);
 
 
 

@@ -7,12 +7,6 @@ class Item(BaseModel):
 class ItemNumber(BaseModel):
     number: int
 
-class Resources(BaseModel):
-    res: list[str]
-
-class Urls(BaseModel):
-    urls: list[str]
-
 class UserSchema(BaseModel):
     email: str
     password: str

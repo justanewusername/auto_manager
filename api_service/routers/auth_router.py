@@ -3,7 +3,7 @@ from database_manager import DatabaseManager
 from fastapi import status, HTTPException, APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse
-from schemas import UserOut, UserAuth
+from schemas import UserSchema
 from database_manager import DatabaseManager
 from uuid import uuid4
 from utils import (
@@ -18,7 +18,7 @@ router = APIRouter(prefix="/auth")
 
 
 @router.post('/signup', summary="Create new user", response_model=UserSchema)
-async def create_user(data: UserAuth):
+async def create_user(data: UserSchema):
     db = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
 
     user = db.get_user_by_email(data.email)

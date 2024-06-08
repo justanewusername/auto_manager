@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import './tile.css'
 import axios from "axios";
-import config from "../config,js";
+import config from "../config.js";
 
 function Tile(props) {
     console.log("hello", props.in_favorite)

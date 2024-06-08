@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import './control.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import config from "../config,js";
+import config from "../config.js";
 
 function Control({ changePage, onRefreshClick, setFilter }) {
     const [selectedResourceOption, setSelectedResourceOption] = useState("all");
@@ -35,9 +35,11 @@ function Control({ changePage, onRefreshClick, setFilter }) {
     const postData = async () => {
         try {
           const response = await axios.post(
-            config.apiUrl + '/run',
+            config.apiUrl + '/posts/titles/test',
             {
-              name: selectedResourceOption,
+              resources: [selectedResourceOption],
+              urls: [],
+              period_days: 10,
             }
           );
     

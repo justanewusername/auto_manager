@@ -4,11 +4,6 @@ from fastapi import status, HTTPException
 from fastapi import APIRouter
 from schemas import *
 
-# class Item(BaseModel):
-#     name: str
-
-# class ItemNumber(BaseModel):
-#     number: int
 
 router = APIRouter(prefix="/favorites")
 

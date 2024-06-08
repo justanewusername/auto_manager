@@ -2,7 +2,7 @@ import React, { useState, useEffect, forwardRef, useImperativeHandle } from "rea
 import Tile from "./tile";
 import './postContainer.css';
 import axios from "axios";
-import config from "../config,js";
+import config from "../config.js";
 
 const PostsContainer = forwardRef((props, ref) => {
     const [posts, setPosts] = useState([]);

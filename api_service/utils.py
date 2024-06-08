@@ -8,8 +8,8 @@ from fastapi import HTTPException, status
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
 ALGORITHM = "HS256"
-JWT_SECRET_KEY = os.environ['48d6926cfa170d8a387752116262bc83016e6e5da1ce98d29c205cb24746344c']
-JWT_REFRESH_SECRET_KEY = os.environ['9bf39ebb7068cc079678a6f17cfdf65d9c657dc09133c2a4bb78f9f2aa03f2d4']
+JWT_SECRET_KEY = os.environ['JWT_SECRET_KEY']
+JWT_REFRESH_SECRET_KEY = os.environ['JWT_REFRESH_SECRET_KEY']
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

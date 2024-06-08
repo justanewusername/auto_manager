@@ -1,6 +1,6 @@
+from typing import List
 from fastapi import Response, status, HTTPException, WebSocket, APIRouter
 from broker_manager import BrokerManager
-from pydantic import BaseModel
 
 from database_manager import DatabaseManager
 from docx import Document
@@ -13,17 +13,6 @@ from schemas import *
 
 router = APIRouter()
 
-# class Item(BaseModel):
-#     name: str
-
-# class ItemNumber(BaseModel):
-#     number: int
-
-# class Resources(BaseModel):
-#     res: list[str]
-
-# class Urls(BaseModel):
-#     urls: list[str]
 
 @router.get("/download/all/")
 async def download_all_posts():
@@ -91,14 +80,14 @@ async def create_item(item: Item):
     return item.name
 
 
-@router.get("/posts/titles")
-def get_titles(resource: str):
-    queue_name = 'apiparser'
-    broker = BrokerManager(queue_name, 'broker')
-    msg = json.dumps({'type': "titles", 'resource': resource})
-    broker.send_msg(msg)
-    broker.close()
-    return
+# @router.get("/posts/titles")
+# def get_titles(resource: str):
+#     queue_name = 'apiparser'
+#     broker = BrokerManager(queue_name, 'broker')
+#     msg = json.dumps({'type': "titles", 'resource': resource})
+#     broker.send_msg(msg)
+#     broker.close()
+#     return
 
 # websockets
 connected_websockets = set()
@@ -126,8 +115,18 @@ async def parse_titles():
     posts = db.get_all_posts()
     return posts
 
-@router.post("/posts/titles")
-async def parse_titles(resources: Resources, urls: Urls, period_days: int):
+
+class ParseTitlesRequest(BaseModel):
+    resources: List[str]
+    urls: List[str]
+    period_days: int
+
+@router.post("/posts/titles/test")
+async def parse_titles(request: ParseTitlesRequest):
+    print('hallo!!!')
+    print(request.resources)
+    print(request.urls)
+    print(request.period_days)
     parsers = {
         'SCIENTIFICAMERICAN': 'https://www.scientificamerican.com/artificial-intelligence/',
         'MIT': 'https://news.mit.edu/topic/artificial-intelligence2',
@@ -139,23 +138,28 @@ async def parse_titles(resources: Resources, urls: Urls, period_days: int):
 
     processed_urls = []
 
-    for item in resources:
+    for item in request.resources:
+        if item == 'all':
+            processed_urls = list(parsers.values())
+            break
+                
         if item in parsers:
             processed_urls.append(parsers[item])
 
-    for item in urls:
+    for item in request.urls:
         processed_urls.append(item)
 
     queue_name = 'apiparser'
     broker = BrokerManager(queue_name, 'broker')
     msg = json.dumps({'type': 'titles',
                       'resources': processed_urls, 
-                      'period_days': period_days
+                      'period_days': request.period_days
                     })
     
     broker.send_msg(msg)
     broker.close()
-    return item.name
+    print("отправленно!!!!!!!!")
+    return {"message": "Запрос успешно обработан"}
 
 
 @router.post("/posts/sendprogress")
