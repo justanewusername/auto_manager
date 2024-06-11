@@ -60,9 +60,6 @@ function Tile(props) {
     return (
         <div className="tile">
             <h3 className="tile_title">{props.title}</h3>
-            <p className="tile_post">
-                {props.post}
-            </p>
             <button className={isInFavorites ? "button_active" : ""} onClick={onFavoritesClick}>
                 {isInFavorites ? "Сохранено в избранном" : "В избранное"}
             </button>

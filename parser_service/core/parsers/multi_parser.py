@@ -23,20 +23,20 @@ class MultiParser:
 
     def run(self, site='ALL', days : int = 14) -> None:
         if site.upper() == 'ALL':
-            for parser in self.parsers:
+            for parser in self.parsers.values():
                 self.crawler_process.crawl(parser, days=days)
         else:
             self.crawler_process.crawl(self.parsers[site.upper()], days=days)
-        self.crawler_process.start()
+        self.crawler_process.start(stop_after_crawl=False)
 
 
     def run_title_parser(self, resources: list[str]) -> None:
         self.crawler_process.crawl(UniversalTitleParser,
                                    start_urls=resources)
-        self.crawler_process.start()
+        self.crawler_process.start(stop_after_crawl=False)
 
 
     def run_article_parser(self, resource: str) -> None:
         self.crawler_process.crawl(UniversalArticleParser,
                                    start_urls=[resource])
-        self.crawler_process.start()
+        self.crawler_process.start(stop_after_crawl=False)

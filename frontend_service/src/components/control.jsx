@@ -34,6 +34,8 @@ function Control({ changePage, onRefreshClick, setFilter }) {
 
     const postData = async () => {
         try {
+          console.log('@@@@@@@@@@@@@@@@@');
+          console.log(selectedResourceOption);
           const response = await axios.post(
             config.apiUrl + '/posts/titles/test',
             {

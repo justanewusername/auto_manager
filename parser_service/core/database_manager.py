@@ -51,38 +51,26 @@ class DatabaseManager:
 
 
     # POSTS
-    def create_post(self, article: str, title: str, url: str):
-        session = self.SessionLocal()
-        new_post = self.Post(article=article, title=title, url=url)
-        session.add(new_post)
-        
-        session.flush()
-        session.refresh(new_post)
-
-        session.expunge_all()
-        session.commit()
-        session.close()
-        
-        return {"id": new_post.id}
-    
-    def creat_post(self, title: str, url: str):
+    def create_post(self, title: str, url: str, article: str = None):
         today = datetime.today()
-        # Форматируем дату в строку с помощью strftime()
         formatted_date = today.strftime('%d.%m.%Y')
 
         session = self.SessionLocal()
-        new_post = self.Post(title=title,
-                             url=url,
-                             last_update=formatted_date)
+        new_post = self.Post(
+            title=title,
+            url=url,
+            article=article,
+            last_update=formatted_date
+        )
         session.add(new_post)
-        
+
         session.flush()
         session.refresh(new_post)
 
         session.expunge_all()
         session.commit()
         session.close()
-        
+
         return {"id": new_post.id}
 
     def get_post_by_id(self, post_id: int):

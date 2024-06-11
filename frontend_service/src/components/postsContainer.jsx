@@ -55,7 +55,6 @@ const PostsContainer = forwardRef((props, ref) => {
     tiles = posts.map((post, index) => (
       <Tile key={index}
             tileId={post.id}
-            post={post.article}
             onDelete={handleTileDelete}
             refresh={getPosts}
             title={post.title}

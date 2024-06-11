@@ -11,4 +11,3 @@ RUN pip install poetry
 
 COPY . /app/api_service
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
-

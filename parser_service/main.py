@@ -3,17 +3,20 @@ from core.parsers import MultiParser
 from scrapy import cmdline
 import json
 from core.broker.broker_manager import BrokerManager
+from core.broker.message_buffer import MessageBuffer, ConnectionPool
 import csv
 
 class Main:
     def __init__(self) -> None:
         print('STARTING!!!')
         config = Config()
-        # self.second_process()
+        self.second_process()
         ##############################
-        multi_parser = MultiParser()
-        multi_parser.run_title_parser(['https://gizmodo.com/tech/artificial-intelligence',
-                                       'https://syncedreview.com/category/popular/'])
+        # 1
+        # multi_parser = MultiParser()
+        # multi_parser.run_title_parser(['https://gizmodo.com/tech/artificial-intelligence',
+        #                                'https://syncedreview.com/category/popular/'])
+        # 2
         # multi_parser.run_article_parser('https://www.scientificamerican.com/article/stanford-ai-index-rapid-progress/')
 
     def readCSV(self) -> list[any]:
@@ -29,16 +32,17 @@ class Main:
     def callback(self, ch, method, properties, body):
         print('RECIVED')
         
-        multi_parser = MultiParser()
         msg = json.loads(body)
 
         if msg['type'] == 'titles':
             print('TITLES!!!')
+            multi_parser = MultiParser()
             multi_parser.run_title_parser(resources=msg['resources'])
-
-        if msg['resource'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
+        elif msg['resources'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
+            multi_parser = MultiParser()
             multi_parser.run(site=msg['resource'])
         else:
+            multi_parser = MultiParser()
             multi_parser.run()
 
     def second_process(self) -> None:
@@ -49,6 +53,12 @@ class Main:
         print(' [*] Waiting for messages.')
         broker.channel.start_consuming()
 
+        # buffer = MessageBuffer()
+        # connection_pool = ConnectionPool(host="localhost", queue_name=queue_name, buffer=buffer)
+        # consumer_thread = threading.Thread(target=connection_pool.consume, args=(consume_callback,))
+        # consumer_thread.start()
+
 
 if __name__ == "__main__":
+    print("starting main...")
     Main()

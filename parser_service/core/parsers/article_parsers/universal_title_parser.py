@@ -136,7 +136,7 @@ class UniversalTitleParser(scrapy.Spider):
 
 
     def process_item(self, current_url_index: str, url_count: str, current_article_index: str, article_count: str):
-        url = 'http://localhost:8811/posts/sendprogress' # http://185.233.81.221:8811/posts/sendprogress
+        url = 'http://api_service:81/posts/sendprogress'
         data = {
             'current_url_index': current_url_index,
             'url_count': url_count,
