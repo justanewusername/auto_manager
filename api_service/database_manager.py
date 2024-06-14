@@ -13,11 +13,12 @@ class DatabaseManager:
         class Posts(self.Base):
             __tablename__ = "posts"
             id = Column(Integer, primary_key=True)
-            article = Column(String(32000))
+            article =  Column(String(32000), nullable=True) #Column(String, unique=True)
             title = Column(String, nullable=True)
-            url = Column(String, nullable=True, unique=True)
+            url = Column(String, nullable=True)
             category = Column(String, nullable=True)
             resource = Column(String, nullable=True)
+            last_update = Column(String, nullable=True)
 
         class Users(self.Base):
             __tablename__ = "users"
@@ -75,7 +76,7 @@ class DatabaseManager:
     def get_all_posts(self):
         session = self.SessionLocal()
 
-        posts = session.query(self.Post, exists().where(self.Favorites.post_id == self.Post.id).label('in_favorites')).all()
+        posts = session.query(self.Post, exists().where(self.Favorites.post_id == self.Post.id).label('in_favorites')).limit(10).all()
 
         session.expunge_all()
         session.close()

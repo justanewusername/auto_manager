@@ -12,9 +12,9 @@ class DatabaseManager:
 
         # Определение модели данных (ORM)
         class Posts(self.Base):
-            __tablename__ = "items"
+            __tablename__ = "posts"
             id = Column(Integer, primary_key=True)
-            article = Column(String, unique=True)
+            article =  Column(String(32000), nullable=True) #Column(String, unique=True)
             title = Column(String, nullable=True)
             url = Column(String, nullable=True)
             category = Column(String, nullable=True)

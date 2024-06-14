@@ -85,15 +85,6 @@ async def create_item(item: Item):
     return item.name
 
 
-# @router.get("/posts/titles")
-# def get_titles(resource: str):
-#     queue_name = 'apiparser'
-#     broker = BrokerManager(queue_name, 'broker')
-#     msg = json.dumps({'type': "titles", 'resource': resource})
-#     broker.send_msg(msg)
-#     broker.close()
-#     return
-
 # websockets
 connected_websockets = set()
 
@@ -103,6 +94,7 @@ async def send_message(message):
 
 @router.websocket("/posts/progress/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    print("wow")
     await websocket.accept()
     connected_websockets.add(websocket)
     print(websocket)
@@ -117,9 +109,12 @@ async def websocket_endpoint(websocket: WebSocket):
 
 # DONE
 @router.get("/posts/titles")
-async def parse_titles():
+async def get_titles_from_db():
+    print("geting titles from db...")
     db = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
     posts = db.get_all_posts()
+    print('sending (', len(posts), ' items)...')
+    print(posts)
     return posts
 
 
@@ -129,19 +124,12 @@ class ParseTitlesRequest(BaseModel):
     period_days: int
 
 # DONE
-@router.post("/posts/titles/test")
+@router.post("/posts/titles")
 async def parse_titles(request: ParseTitlesRequest):
     print('hallo!!!')
     print(request.resources)
     print(request.urls)
     print(request.period_days)
-
-    # buffer = MessageBuffer()
-    # connection_pool = ConnectionPool(host="localhost", queue_name="your_queue", buffer=buffer)
-    # consumer_thread = threading.Thread(target=connection_pool.consume, args=(consume_callback,))
-    # consumer_thread.start()
-
-    # connection_pool.publish(msg)
 
     parsers = {
         'SCIENTIFICAMERICAN': 'https://www.scientificamerican.com/artificial-intelligence/',
@@ -184,6 +172,7 @@ class ProgressRequest(BaseModel):
     current_article_index: str
     article_count: str
 
+
 @router.post("/posts/sendprogress")
 async def send_progress(request: ProgressRequest):
     print('sended progress')
@@ -191,7 +180,3 @@ async def send_progress(request: ProgressRequest):
     print('url_count ', request.url_count)
     print('current_article_index ', request.current_article_index)
     print('article_count ',  request.article_count)
-            # 'current_url_index': current_url_index,
-            # 'url_count': url_count,
-            # 'current_article_index': current_article_index,
-            # 'article_count': article_count,

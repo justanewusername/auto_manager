@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import './control.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
@@ -32,12 +32,49 @@ function Control({ changePage, onRefreshClick, setFilter }) {
         setFilter(selectedResourceOption);
     }
 
+    // websockets
+    const [messages, setMessages] = useState([]);
+    const [ws, setWs] = useState(null);
+  
+    useEffect(() => {
+        console.log("hello");
+        // Create WebSocket connection.
+        const socket = new WebSocket(config.apiWS + '/posts/progress/ws');
+
+        // Connection opened
+        socket.addEventListener('open', (event) => {
+            console.log('Connected to WebSocket server');
+        });
+  
+        // Listen for messages
+        socket.addEventListener('message', (event) => {
+            console.log('Message from server ', event.data);
+            setMessages([event.data]);
+        });
+
+        // Handle connection close
+        socket.addEventListener('close', (event) => {
+            console.log('WebSocket is closed now.');
+        });
+  
+        // Handle errors
+        socket.addEventListener('error', (event) => {
+            console.error('WebSocket error observed:', event);
+        });
+    
+        // Clean up the socket connection when the component unmounts
+        return () => {
+            socket.close();
+        };
+    }, []);
+
+
     const postData = async () => {
         try {
           console.log('@@@@@@@@@@@@@@@@@');
           console.log(selectedResourceOption);
           const response = await axios.post(
-            config.apiUrl + '/posts/titles/test',
+            config.apiUrl + '/posts/titles',
             {
               resources: [selectedResourceOption],
               urls: [],

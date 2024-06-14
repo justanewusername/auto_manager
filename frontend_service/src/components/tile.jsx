@@ -60,11 +60,14 @@ function Tile(props) {
     return (
         <div className="tile">
             <h3 className="tile_title">{props.title}</h3>
-            <button className={isInFavorites ? "button_active" : ""} onClick={onFavoritesClick}>
-                {isInFavorites ? "Сохранено в избранном" : "В избранное"}
-            </button>
-            <a className="tile_source" target="_blank" rel="noreferrer" href={props.url}>source</a>
-            <button className="tile__button-red" onClick={deletePost}>удалить</button>
+            <div className="button_container">
+                <a className="tile_source" target="_blank" rel="noreferrer" href={props.url}>view source</a>
+                {/* <button className={isInFavorites ? "button_active" : ""} onClick={onFavoritesClick}>
+                    {isInFavorites ? "Сохранено в избранном" : "В избранное"}
+                </button> */}
+                <button className="tile__button">generate post</button>
+                <button className="tile__button" onClick={deletePost}>summarize</button>
+            </div>
         </div>
     );
 }

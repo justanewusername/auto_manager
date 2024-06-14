@@ -85,7 +85,9 @@ class TitlePostgresPipeline:
         self.db_manager = DatabaseManager('postgresql://user:qwerty@db:5432/mydbname')
 
     def process_item(self, item, spider):
+        print("i'm here!!!!")
         self.db_manager.create_post(title=item['title'], url=item['url'])
+        print("Nice!")
         return item
 
 

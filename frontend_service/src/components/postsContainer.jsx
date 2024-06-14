@@ -1,4 +1,4 @@
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import Tile from "./tile";
 import './postContainer.css';
 import axios from "axios";
@@ -7,24 +7,18 @@ import config from "../config.js";
 const PostsContainer = forwardRef((props, ref) => {
     const [posts, setPosts] = useState([]);
     // const [tiles, setTiles] = useState();
-    let tiles = [ ];
+    let tiles = [ ];    
 
-    useEffect(() => {
-        if(props.filter !== "all") {
-          setPosts(posts.filter(obj => obj['resource'] == props.filter))
-        } else {
-          getPosts()
-        }
-    }, [props.filter]);
-    
-
-    const getPosts = () => {
+    const getPosts = useCallback(() => {
+      console.log("get posts!!!!")
       console.log(props.url)
       axios.get(props.url)
       .then(response => {
+        console.log("####")
+        console.log(response.data)
         response.data.forEach(x => console.log(x.resource));
 
-        if(props.url == config.apiUrl + "/favorites") {
+        if(props.url === config.apiUrl + "/favorites") {
           let temp = response.data
           temp = temp.filter(obj => obj['in_favorites'] === true)
           setPosts(temp);
@@ -37,7 +31,16 @@ const PostsContainer = forwardRef((props, ref) => {
       .catch(error => {
         console.error("Error fetching posts:", error);
       });
-    }
+    }, [props.url]);
+
+    useEffect(() => {
+      if(props.filter !== "all") {
+        setPosts(posts.filter(obj => obj['resource'] === props.filter))
+      } else {
+        getPosts()
+      }
+  }, [props.filter, getPosts]);
+
 
     useImperativeHandle(ref, () => ({
       getPosts: getPosts
@@ -47,10 +50,10 @@ const PostsContainer = forwardRef((props, ref) => {
         getPosts();
       };
 
-    useEffect(() => {
-        // Fetch posts from the external API
-        getPosts()
-    }, [props.url]);
+    // useEffect(() => {
+    //     // Fetch posts from the external API
+    //     getPosts()
+    // }, [props.url, getPosts]);
     
     tiles = posts.map((post, index) => (
       <Tile key={index}
