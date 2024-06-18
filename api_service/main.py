@@ -8,7 +8,7 @@ from routers import favorites_router, post_router, auth_router
 from fastapi import FastAPI
 
 
-app = FastAPI()
+app = FastAPI(swagger_ui_parameters={"tryItOutEnabled": True})
 
 origins = ["*"]
 

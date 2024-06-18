@@ -3,7 +3,7 @@ from core.parsers import MultiParser
 from scrapy import cmdline
 import json
 from core.broker.broker_manager import BrokerManager
-from core.broker.message_buffer import MessageBuffer, ConnectionPool
+from core.broker.progress_notifier import send_progress
 import csv
 
 class Main:
@@ -37,13 +37,19 @@ class Main:
         if msg['type'] == 'titles':
             print('TITLES!!!')
             multi_parser = MultiParser()
-            multi_parser.run_title_parser(resources=msg['resources'])
+            multi_parser.run_title_parser(resources=msg['resources'], user_id=msg['user_id'])
         elif msg['resources'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
             multi_parser = MultiParser()
             multi_parser.run(site=msg['resource'])
         else:
             multi_parser = MultiParser()
             multi_parser.run()
+        print("__________END__________")
+        print("__________END__________")
+        print("__________END__________")
+        print("__________END__________")
+        send_progress(msg['user_id'], 'done')
+        
 
     def second_process(self) -> None:
         queue_name = 'apiparser'
@@ -52,11 +58,6 @@ class Main:
 
         print(' [*] Waiting for messages.')
         broker.channel.start_consuming()
-
-        # buffer = MessageBuffer()
-        # connection_pool = ConnectionPool(host="localhost", queue_name=queue_name, buffer=buffer)
-        # consumer_thread = threading.Thread(target=connection_pool.consume, args=(consume_callback,))
-        # consumer_thread.start()
 
 
 if __name__ == "__main__":

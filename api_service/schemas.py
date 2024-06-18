@@ -18,5 +18,3 @@ class TokenPayload(BaseModel):
 class SystemUser(BaseModel):
     id: int
     email: str
-    is_active: bool = True
-    is_superuser: bool = False

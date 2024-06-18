@@ -3,11 +3,13 @@ import axios from "axios";
 import './control.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import config from "../config.js";
+import Cookies from 'js-cookie'
 
 function Control({ changePage, onRefreshClick, setFilter }) {
     const [selectedResourceOption, setSelectedResourceOption] = useState("all");
     const [selectedTypeOption, setSelectedTypeOption] = useState("all");
     const [response, setResponse] = useState(null);
+    const [counter, setCounter] = useState(0);
 
     const resourcesOptions = [
         "all", 
@@ -34,12 +36,18 @@ function Control({ changePage, onRefreshClick, setFilter }) {
 
     // websockets
     const [messages, setMessages] = useState([]);
-    const [ws, setWs] = useState(null);
   
     useEffect(() => {
         console.log("hello");
         // Create WebSocket connection.
         const socket = new WebSocket(config.apiWS + '/posts/progress/ws');
+        socket.onopen = () => {
+            console.log("sending message...");
+            socket.send(JSON.stringify({ 
+                token: Cookies.get('token')
+            }));
+            console.log("message sended");
+        };
 
         // Connection opened
         socket.addEventListener('open', (event) => {
@@ -55,6 +63,10 @@ function Control({ changePage, onRefreshClick, setFilter }) {
         // Handle connection close
         socket.addEventListener('close', (event) => {
             console.log('WebSocket is closed now.');
+            const reconnect = () => {
+                setCounter(counter + 1);
+            }
+            setTimeout(reconnect, 5000);
         });
   
         // Handle errors
@@ -66,24 +78,35 @@ function Control({ changePage, onRefreshClick, setFilter }) {
         return () => {
             socket.close();
         };
-    }, []);
+    }, [counter]);
 
 
     const postData = async () => {
         try {
           console.log('@@@@@@@@@@@@@@@@@');
           console.log(selectedResourceOption);
+          const token = 'Bearer ' + Cookies.get('token');
+          console.log(token);
           const response = await axios.post(
-            config.apiUrl + '/posts/titles',
+            config.apiUrl + '/posts/titles/test',
             {
-              resources: [selectedResourceOption],
-              urls: [],
-              period_days: 10,
+                resources: [selectedResourceOption],
+                urls: [],
+                period_days: 10,
+            },
+            {
+                headers: {
+                    'Authorization': token
+                }
             }
-          );
-    
+          ).then(response => {
+            console.log(response.data);
+            setResponse(response.data);
+          })
+          .catch(error => {
+            console.error("Pars error!!!:", error);
+          });
           // Set the response in the state
-          setResponse(response.data);
         } catch (error) {
           console.error("Error:", error);
         }
@@ -96,6 +119,10 @@ function Control({ changePage, onRefreshClick, setFilter }) {
     const onFavoritesPageSet = () => {
         changePage("favorites");
     };
+
+    const logout = () => {
+        Cookies.set('token', '');
+    }
 
     return (
         <div className="control">
@@ -131,8 +158,13 @@ function Control({ changePage, onRefreshClick, setFilter }) {
                 </div>
                 <button className="button-primary" onClick={applyFilters}>Применить</button>
                 <button className="button-primary" onClick={postData}>Запустить парсер</button>
-                <div className="button-login" onClick={applyFilters}>Log In</div>
-                <div className="button-signin" onClick={applyFilters}>Sign In</div>
+                <div className="button-login">
+                    <Link to="/login">Log In</Link>
+                </div>
+                <div className="button-signin">
+                    <Link to="/signup">Sign In</Link>
+                </div>
+                <div className="button-logout" onClick={logout}>Log Out</div>
             </div>
 
             <div className="panel__right">

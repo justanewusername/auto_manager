@@ -14,6 +14,7 @@ class BrokerManager:
                 self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=self.host))
                 self.channel = self.connection.channel()
                 self.channel.queue_declare(queue=self.queue_name)
+                print('broker connected')
                 break
             except pika.exceptions.AMQPConnectionError as e:
                 print(f"Connection error: {e}. Retrying in 5 seconds...")
@@ -37,7 +38,10 @@ class BrokerManager:
     def send_msg(self, msg):
         while True:
             try:
+                print('sending data...')
                 self.channel.basic_publish(exchange='', routing_key=self.queue_name, body=msg)
+                print('done')
+                break
             except pika.exceptions.AMQPConnectionError as e:
                 print(f"Connection error while sending message: {e}. Reconnecting...")
                 self.connect_to_broker()

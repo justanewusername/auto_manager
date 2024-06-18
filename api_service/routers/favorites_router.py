@@ -3,13 +3,15 @@ from database_manager import DatabaseManager
 from fastapi import status, HTTPException
 from fastapi import APIRouter
 from schemas import *
+from bestconfig import Config
 
 
 router = APIRouter(prefix="/favorites")
+config = Config()
 
 @router.get("/")
 async def get_all_favorites():
-    databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+    databaseManager = DatabaseManager(config['DB_CONNECTION'])
     result = databaseManager.get_all_posts()
     return result
 
@@ -17,7 +19,7 @@ async def get_all_favorites():
 @router.post("/create")
 async def create_item(item: ItemNumber):
     try:
-        databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+        databaseManager = DatabaseManager(config['DB_CONNECTION'])
         result = databaseManager.add_to_favorites(item.number)
     except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
@@ -27,7 +29,7 @@ async def create_item(item: ItemNumber):
 @router.post("/del")
 async def create_item(item: ItemNumber):
     try:
-        databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+        databaseManager = DatabaseManager(config['DB_CONNECTION'])
         result = databaseManager.delete_from_favorites(item.number)
     except:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")

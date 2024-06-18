@@ -5,6 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse
 from schemas import UserSchema
 from database_manager import DatabaseManager
+from bestconfig import Config
 from uuid import uuid4
 from utils import (
     get_hashed_password,
@@ -15,11 +16,12 @@ from utils import (
 from schemas import *
 
 router = APIRouter(prefix="/auth")
+config = Config()
 
 
-@router.post('/signup', summary="Create new user", response_model=UserSchema)
+@router.post('/signup', summary="Create new user")
 async def create_user(data: UserSchema):
-    db = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+    db = DatabaseManager(config['DB_CONNECTION'])
 
     user = db.get_user_by_email(data.email)
     if user is not None:
@@ -36,10 +38,12 @@ async def create_user(data: UserSchema):
     return user
 
 
-@router.post('/login', summary="Create access and refresh tokens for user", response_model=UserSchema)
+@router.post('/login', summary="Create access and refresh tokens for user")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    db = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
-    user = db.get_user_by_email(form_data.email)
+    db = DatabaseManager(config['DB_CONNECTION'])
+    user = db.get_user_by_email(form_data.username)
+    print("user:")
+    print(user)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

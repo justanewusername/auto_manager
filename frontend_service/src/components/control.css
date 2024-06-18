@@ -48,11 +48,11 @@
     background-color: #6db1e4;
 }
 
-.button-login, .button-signin {
+.button-login, .button-signin, .button-logout {
     text-decoration: none;
 }
 
-.button-login:hover, .button-signin:hover {
+.button-login:hover, .button-signin:hover, .button-logout:hover {
     cursor: pointer;
 }
 

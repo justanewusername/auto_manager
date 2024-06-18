@@ -3,14 +3,14 @@ from datetime import datetime
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from database_manager import DatabaseManager
-from .utils import (
+from utils import (
     ALGORITHM,
     JWT_SECRET_KEY
 )
 
 from jose import jwt
 from pydantic import ValidationError
-from schemas import TokenPayload, SystemUser
+from schemas import TokenPayload, UserSchema, SystemUser
 
 reuseable_oauth = OAuth2PasswordBearer(
     tokenUrl="/login",
@@ -18,7 +18,8 @@ reuseable_oauth = OAuth2PasswordBearer(
 )
 
 
-async def get_current_user(token: str = Depends(reuseable_oauth)) -> SystemUser:
+def get_current_user_impl(token: str = Depends(reuseable_oauth)) -> SystemUser:
+    print("hello i'm here!!!")
     try:
         payload = jwt.decode(
             token, JWT_SECRET_KEY, algorithms=[ALGORITHM]
@@ -31,7 +32,8 @@ async def get_current_user(token: str = Depends(reuseable_oauth)) -> SystemUser:
                 detail="Token expired",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-    except(jwt.JWTError, ValidationError):
+    except(jwt.JWTError, ValidationError) as e:
+        print(f"JWT validation error: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
@@ -39,7 +41,8 @@ async def get_current_user(token: str = Depends(reuseable_oauth)) -> SystemUser:
         )
     
     db = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
-    user: Union[dict[str, Any], None] = db.get(token_data.sub, None)
+    # token_data.sub is users email
+    user = db.get_user_by_email(token_data.sub)
     
     
     if user is None:
@@ -47,5 +50,30 @@ async def get_current_user(token: str = Depends(reuseable_oauth)) -> SystemUser:
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Could not find user",
         )
+    
+    return SystemUser(id=user['id'], email=user['email'])
+
+
+def get_current_user(token: str) -> SystemUser:
+    print("hello i'm here!!!")
+    try:
+        payload = jwt.decode(
+            token, JWT_SECRET_KEY, algorithms=[ALGORITHM]
+        )
+        token_data = TokenPayload(**payload)
+        
+        if datetime.fromtimestamp(token_data.exp) < datetime.now():
+            return None
+        
+    except(jwt.JWTError, ValidationError):
+        return None
+    
+    db = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+    # token_data.sub is users email
+    user = db.get_user_by_email(token_data.sub)
+    
+    
+    if user is None:
+        return None
     
     return SystemUser(**user)

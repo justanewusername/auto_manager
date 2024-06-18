@@ -71,8 +71,8 @@ services:
         image: rabbitmq
         command: rabbitmq-server
         expose:
-            - "5672"
-            - "15672"
+            - 5672:5672
+            - 15672:15672
         healthcheck:
             test: rabbitmq-diagnostics -q ping
             interval: 30s

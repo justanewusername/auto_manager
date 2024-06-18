@@ -3,7 +3,7 @@ import scrapy
 from datetime import datetime
 from dateutil import parser
 from urllib.parse import urlparse
-import requests
+from core.broker.progress_notifier import send_progress
 
 class UniversalTitleParser(scrapy.Spider):
     name = 'Universal title Parser'
@@ -21,6 +21,7 @@ class UniversalTitleParser(scrapy.Spider):
         self.days = kwargs.get('days', 14)
         self.category = kwargs.get('category', 'other')
         self.resource = kwargs.get('resource', 'other')
+        self.user_id = kwargs.get('user_id', '1')
 
     
     def parse(self, response):
@@ -40,8 +41,7 @@ class UniversalTitleParser(scrapy.Spider):
 
         for article in articles:
             
-            # self.send_progress(response=response, articles_count=len(articles),
-            #                    current_article_index=current_article_index)
+            send_progress(user_id=self.user_id, status='progress')
 
             right_title_pattern = self.find_right_title_pattern(article=article)
             title = article.css(right_title_pattern).extract()
@@ -69,6 +69,7 @@ class UniversalTitleParser(scrapy.Spider):
                 'resource': self.resource,
                 'last_update': datetime.today().strftime('%d.%m.%Y'),
             }
+        
 
 
     def find_right_title_pattern(self, article):
@@ -125,33 +126,3 @@ class UniversalTitleParser(scrapy.Spider):
                 url = '/' + url
             url = base_url + url
         return url
-    
-
-    def send_progress(self, response, articles_count, current_article_index):
-        url_count = len(self.start_urls)
-
-        self.process_item(current_article_index=str(current_article_index),
-                          article_count=str(articles_count),
-                          current_url_index=str(self.start_urls.index(response.url) + 1),
-                          url_count=str(len(self.start_urls)))
-
-
-    def process_item(self, current_url_index: str, url_count: str, current_article_index: str, article_count: str):
-        url = 'http://api_service:81/posts/sendprogress'
-        data = {
-            'current_url_index': current_url_index,
-            'url_count': url_count,
-            'current_article_index': current_article_index,
-            'article_count': article_count,
-        }
-        try:
-            response = requests.post(url, json=data)
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as http_err:
-            print(f"HTTP error occurred: {http_err}")  # Вывод ошибки HTTP
-        except requests.exceptions.ConnectionError as conn_err:
-            print(f"Connection error occurred: {conn_err}")  # Вывод ошибки соединения
-        except requests.exceptions.Timeout as timeout_err:
-            print(f"Timeout error occurred: {timeout_err}")  # Вывод ошибки таймаута
-        except requests.exceptions.RequestException as req_err:
-            print(f"An error occurred: {req_err}")  # Вывод остальных ошибок

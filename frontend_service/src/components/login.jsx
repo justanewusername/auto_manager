@@ -1,14 +1,40 @@
 import React, {useState} from "react";
 import './login.css';
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
+import config from "../config";
+import Cookies from 'js-cookie'
 
 const LogIn = (props) => {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
   
     const handleSubmit = (event) => {
       event.preventDefault();
-      // TODO добавить логику для отправки данных на сервер
+      const userData = {
+        "username": email, 
+        "password": password
+      };
+
+      console.log('i send: ', userData);
+
+      axios.post(config.apiUrl + "/auth/login",
+        userData,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        })
+      .then(response => {
+        console.log("login done:")
+        console.log(response.data)
+        Cookies.set('token', response.data.access_token, { expires: 30 })
+        navigate('/');
+      })
+      .catch(error => {
+        console.error("Error login:", error);
+      });
       console.log('Submitted:', email, password);
     };
 

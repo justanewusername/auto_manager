@@ -25,6 +25,7 @@ class DatabaseManager:
             id = Column(Integer, primary_key=True)
             email = Column(String, nullable=False)
             password = Column(String, nullable=False)
+            websocket_connection = Column(String, nullable=True)
 
         class Favorites(self.Base):
             __tablename__ = "favorites"
@@ -189,7 +190,7 @@ class DatabaseManager:
         return posts_list
     
 
-####### AUTH
+####### USER
 
     def create_user(self, email: str, password: str):
         session = self.SessionLocal()
@@ -222,4 +223,51 @@ class DatabaseManager:
         session.close()
         if user is None:
             return None
-        return user
+        data = {
+            'id': user.id,
+            'email': user.email,
+            'password': user.password,
+        }
+        return data
+
+
+    def get_websocket_connection_by_id(self, user_id: int):
+        session = self.SessionLocal()
+        user = session.query(self.Users).filter(self.Users.id == user_id).first()
+        session.expunge_all()
+        session.close()
+        if user is None:
+            return None
+        return user.websocket_connection
+
+    def update_websocket_connection_by_id(self, user_id: int, connection: str):
+        session = self.SessionLocal()
+        try:
+            user = session.query(self.Users).filter_by(id=user_id).first()
+            if user:
+                user.websocket_connection = connection
+                session.commit()
+                return {"message": "Connection updated successfully"}
+            else:
+                return {"message": "User not found"}
+        except Exception as e:
+            session.rollback()
+            return {"message": str(e)}
+        finally:
+            session.close()
+
+    def update_websocket_connection_by_email(self, user_email: str, connection: str):
+        session = self.SessionLocal()
+        try:
+            user = session.query(self.Users).filter_by(email=user_email).first()
+            if user:
+                user.websocket_connection = connection
+                session.commit()
+                return {"message": "Connection updated successfully"}
+            else:
+                return {"message": "User not found"}
+        except Exception as e:
+            session.rollback()
+            return {"message": str(e)}
+        finally:
+            session.close()

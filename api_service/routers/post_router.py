@@ -1,9 +1,11 @@
 from traceback import print_tb
 from typing import List
-from fastapi import Response, status, HTTPException, WebSocket, APIRouter
+from fastapi import Response, status, HTTPException, WebSocket, APIRouter, Depends, Body
 from broker_manager import BrokerManager
 from message_buffer import ConnectionPool, MessageBuffer
+from deps import get_current_user_impl, get_current_user
 import threading
+import json
 
 from database_manager import DatabaseManager
 from docx import Document
@@ -12,12 +14,15 @@ import asyncio
 import json
 import io
 from schemas import *
+from bestconfig import Config
 
 
 router = APIRouter()
 
+config = Config()
+
 queue_name = 'apiparser'
-broker = BrokerManager(queue_name, 'broker')
+broker_host = config['BROKER_HOST']
 
 @router.get("/download/all/")
 async def download_all_posts():
@@ -26,7 +31,7 @@ async def download_all_posts():
         doc = Document()
         doc.add_heading('Сгенерированные посты', level=1)
 
-        databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+        databaseManager = DatabaseManager(config['DB_CONNECTION'])
         posts = databaseManager.get_all_posts()
         for post in posts:
             doc.add_heading(post['title'], level=2)
@@ -49,36 +54,35 @@ async def download_all_posts():
 
 @router.get("/all/")
 async def read_all():
-    databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+    databaseManager = DatabaseManager(config['DB_CONNECTION'])
     result = databaseManager.get_all_posts()
     return result
 
 
 @router.get("/all/del/")
 async def delete_all():
-    databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+    databaseManager = DatabaseManager(config['DB_CONNECTION'])
     result = databaseManager.delete_all_posts()
     return result
 
 
 @router.post("/del/")
 async def delete_item(item: ItemNumber):
-    databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+    databaseManager = DatabaseManager(config['DB_CONNECTION'])
     result = databaseManager.delete_post_by_id(item.number)
     return result
 
 
 @router.post("/create/")
 async def create_item(item: Item):
-    databaseManager = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+    databaseManager = DatabaseManager(config['DB_CONNECTION'])
     result = databaseManager.create_post(item.name)
     return result
 
 
 @router.post("/run")
 async def create_item(item: Item):
-    queue_name = 'apiparser'
-    broker = BrokerManager(queue_name, 'broker')
+    broker = BrokerManager(queue_name, broker_host)
     msg = json.dumps({'type': 'standart','resource': item.name})
     broker.send_msg(msg)
     broker.close()
@@ -86,24 +90,39 @@ async def create_item(item: Item):
 
 
 # websockets
-connected_websockets = set()
+connected_websockets = {}
 
-async def send_message(message):
-    if connected_websockets:
-        await asyncio.wait([ws.send(message) for ws in connected_websockets])
+async def send_message(user_id:int, message: str):
+    if str(user_id) in connected_websockets:
+        msg = json.dumps({'message': message})
+        ws_connection = connected_websockets[str(user_id)]
+        await ws_connection.send_text(message)
 
 @router.websocket("/posts/progress/ws")
 async def websocket_endpoint(websocket: WebSocket):
     print("wow")
     await websocket.accept()
-    connected_websockets.add(websocket)
-    print(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            await send_message(data)
+            print("recived data:", data)
+            data = json.loads(data)
+            print("testtest: ", (data['token']))
+
+            # getting user email
+            user = get_current_user(data['token'])
+            if user is None:
+                print("fuck")
+                return
+            
+            # saving in dict
+            connected_websockets[str(user.id)] = websocket
+
+            # await send_message(data)
     except websockets.exceptions.ConnectionClosedError:
-        connected_websockets.remove(websocket)
+        for key, value in dict(connected_websockets).items():
+            if value == websocket:
+                del connected_websockets[key]
 
 ################
 
@@ -111,7 +130,7 @@ async def websocket_endpoint(websocket: WebSocket):
 @router.get("/posts/titles")
 async def get_titles_from_db():
     print("geting titles from db...")
-    db = DatabaseManager("postgresql://user:qwerty@db:5432/mydbname")
+    db = DatabaseManager(config['DB_CONNECTION'])
     posts = db.get_all_posts()
     print('sending (', len(posts), ' items)...')
     print(posts)
@@ -124,8 +143,8 @@ class ParseTitlesRequest(BaseModel):
     period_days: int
 
 # DONE
-@router.post("/posts/titles")
-async def parse_titles(request: ParseTitlesRequest):
+@router.post("/posts/titles/test")
+async def parse_titles(request: ParseTitlesRequest, user: SystemUser = Depends(get_current_user_impl)):
     print('hallo!!!')
     print(request.resources)
     print(request.urls)
@@ -141,7 +160,6 @@ async def parse_titles(request: ParseTitlesRequest):
     }
 
     processed_urls = []
-
     for item in request.resources:
         if item == 'all':
             processed_urls = list(parsers.values())
@@ -152,31 +170,37 @@ async def parse_titles(request: ParseTitlesRequest):
 
     for item in request.urls:
         processed_urls.append(item)
+    
+    print('wow, i can get id: ', user.id)
 
-    # queue_name = 'apiparser'
-    # broker = BrokerManager(queue_name, 'broker')
     msg = json.dumps({'type': 'titles',
                       'resources': processed_urls, 
-                      'period_days': request.period_days
+                      'period_days': request.period_days,
+                      'user_id': user.id
                     })
     
+    broker = BrokerManager(queue_name, broker_host)
     broker.send_msg(msg)
-    # broker.close()
+    broker.close()
     print("отправленно!!!!!!!!")
     return {"message": "Запрос успешно обработан"}
 
 
-class ProgressRequest(BaseModel):
-    current_url_index: str
-    url_count: str
-    current_article_index: str
-    article_count: str
+# class ProgressRequest(BaseModel):
+#     user_id: int
+#     current_url_index: str
+#     url_count: str
+#     current_article_index: str
+#     article_count: str
 
+class ProgressRequest(BaseModel):
+    user_id: int
+    status: str
 
 @router.post("/posts/sendprogress")
 async def send_progress(request: ProgressRequest):
     print('sended progress')
-    print('current_url_index ', request.current_url_index)
-    print('url_count ', request.url_count)
-    print('current_article_index ', request.current_article_index)
-    print('article_count ',  request.article_count)
+    await send_message(request.user_id, request.status)
+    print('sended!')
+    
+    

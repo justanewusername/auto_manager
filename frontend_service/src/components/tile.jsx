@@ -57,6 +57,10 @@ function Tile(props) {
         });
     }
 
+    const generatePost = () => {
+        
+    }
+
     return (
         <div className="tile">
             <h3 className="tile_title">{props.title}</h3>
@@ -65,7 +69,7 @@ function Tile(props) {
                 {/* <button className={isInFavorites ? "button_active" : ""} onClick={onFavoritesClick}>
                     {isInFavorites ? "Сохранено в избранном" : "В избранное"}
                 </button> */}
-                <button className="tile__button">generate post</button>
+                <button className="tile__button" onclick={generatePost}>generate post</button>
                 <button className="tile__button" onClick={deletePost}>summarize</button>
             </div>
         </div>

@@ -1,8 +1,11 @@
 import React, {useState} from "react";
 import './signup.css';
 import axios from "axios";
+import config from "../config";
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = (props) => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
@@ -19,7 +22,22 @@ const SignUp = (props) => {
     
       const handleSubmit = (e) => {
         e.preventDefault();
-        // TODO выполнить дальнейшие действия, отправку данных на сервер
+        const userData = {
+          "email": formData.email, 
+          "password": formData.password
+        };
+
+        console.log('i send: ', userData);
+
+        axios.post(config.apiUrl + "/auth/signup", userData)
+        .then(response => {
+          console.log("auth done")
+          console.log(response.data)
+          navigate('/');
+        })
+        .catch(error => {
+          console.error("Error signup:", error);
+        });
         console.log(formData);
       };
 
