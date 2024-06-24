@@ -38,6 +38,7 @@ class BrokerManager:
         while True:
             try:
                 self.channel.basic_publish(exchange='', routing_key=self.queue_name, body=msg)
+                break
             except pika.exceptions.AMQPConnectionError as e:
                 print(f"Connection error while sending message: {e}. Reconnecting...")
                 self.connect_to_broker()

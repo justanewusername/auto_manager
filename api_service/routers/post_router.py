@@ -1,16 +1,13 @@
-from traceback import print_tb
 from typing import List
-from fastapi import Response, status, HTTPException, WebSocket, APIRouter, Depends, Body
+from fastapi import Response, status, HTTPException, WebSocket, APIRouter, Depends, Body, WebSocketDisconnect
+from telegram_sender import TelegramSender
 from broker_manager import BrokerManager
-from message_buffer import ConnectionPool, MessageBuffer
 from deps import get_current_user_impl, get_current_user
-import threading
 import json
 
 from database_manager import DatabaseManager
 from docx import Document
 import websockets
-import asyncio
 import json
 import io
 from schemas import *
@@ -89,14 +86,18 @@ async def create_item(item: Item):
     return item.name
 
 
+# DONE
 # websockets
 connected_websockets = {}
 
-async def send_message(user_id:int, message: str):
+async def send_message(user_id:int, message: str, message_type: str):
+    print("7777777777777: ", user_id)
+    print('8888888888888: ', message_type)
     if str(user_id) in connected_websockets:
-        msg = json.dumps({'message': message})
+        print('hi!')
+        msg = json.dumps({'message': message, 'type': message_type})
         ws_connection = connected_websockets[str(user_id)]
-        await ws_connection.send_text(message)
+        await ws_connection.send_text(msg)
 
 @router.websocket("/posts/progress/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -123,7 +124,10 @@ async def websocket_endpoint(websocket: WebSocket):
         for key, value in dict(connected_websockets).items():
             if value == websocket:
                 del connected_websockets[key]
-
+    except WebSocketDisconnect:
+        for key, value in dict(connected_websockets).items():
+            if value == websocket:
+                del connected_websockets[key]
 ################
 
 # DONE
@@ -136,11 +140,6 @@ async def get_titles_from_db():
     print(posts)
     return posts
 
-
-class ParseTitlesRequest(BaseModel):
-    resources: List[str]
-    urls: List[str]
-    period_days: int
 
 # DONE
 @router.post("/posts/titles/test")
@@ -186,21 +185,41 @@ async def parse_titles(request: ParseTitlesRequest, user: SystemUser = Depends(g
     return {"message": "Запрос успешно обработан"}
 
 
-# class ProgressRequest(BaseModel):
-#     user_id: int
-#     current_url_index: str
-#     url_count: str
-#     current_article_index: str
-#     article_count: str
-
-class ProgressRequest(BaseModel):
-    user_id: int
-    status: str
-
 @router.post("/posts/sendprogress")
 async def send_progress(request: ProgressRequest):
     print('sended progress')
-    await send_message(request.user_id, request.status)
+    await send_message(request.user_id, request.status, 'progress')
     print('sended!')
     
-    
+
+# articles
+
+@router.post("/posts/article")
+async def parse_titles(request: ParseArticleRequest, user: SystemUser = Depends(get_current_user_impl)):
+    msg = json.dumps({'type': 'articles',
+                      'resources': request.url,
+                      'user_id': user.id
+                    })
+    print('33333333333333333333333333333: ', user.id)
+    broker = BrokerManager(queue_name, broker_host)
+    broker.send_msg(msg)
+    broker.close()
+    print("отправленно!!!!!!!!")
+    return {"message": "Запрос успешно обработан"}
+
+
+@router.post("/posts/sendpost")
+async def send_progress(request: PostRequest):
+    await send_message(request.user_id, request.content, 'post')
+
+
+# answers and posts
+
+@router.post("/posts/telegram")
+async def create_item(request: PostSchema):
+    db = DatabaseManager(config['DB_CONNECTION'])
+    tg_sender = TelegramSender()
+    message_id_list = await tg_sender.send_message(post=request.post)
+    for message_id in message_id_list:
+        db.add_message_id(post_id=request.post_id, message_id=message_id)
+    return

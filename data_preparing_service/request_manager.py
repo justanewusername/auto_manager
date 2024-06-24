@@ -1,10 +1,10 @@
 import requests
 
-def send_progress(user_id: int, status: str):
-    url = 'http://api_service:81/posts/sendprogress'
+def send_post(user_id: int, content: str):
+    url = 'http://api_service:81/posts/sendpost'
     data = {
         'user_id': user_id,
-        'status': status,
+        'content': content,
     }
     try:
         resp = requests.post(url, json=data)

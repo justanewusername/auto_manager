@@ -21,7 +21,7 @@ class UniversalTitleParser(scrapy.Spider):
         self.days = kwargs.get('days', 14)
         self.category = kwargs.get('category', 'other')
         self.resource = kwargs.get('resource', 'other')
-        self.user_id = kwargs.get('user_id', '1')
+        self.user_id = kwargs.get('user_id', None)
 
     
     def parse(self, response):
@@ -40,13 +40,14 @@ class UniversalTitleParser(scrapy.Spider):
             yield ''
 
         for article in articles:
-            
             send_progress(user_id=self.user_id, status='progress')
 
             right_title_pattern = self.find_right_title_pattern(article=article)
             title = article.css(right_title_pattern).extract()
             title = max(title, key=len)
             title = self.proccess_title(title)
+            if len(title) < 20:
+                continue
 
             date_str = article.css('time ::attr(datetime)').get()
             if date_str is not None:

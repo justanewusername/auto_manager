@@ -1,4 +1,3 @@
-# telegram
-API_TOKEN: '6833132952:AAEGU-cqcCUPThlDpqRmm4oP-9f5a6P5U_U'
+API_TOKEN: '6701555808:AAFvV6sDNfpibyeJI5Y7_Xf8-fNbaFwO2UA'
 QUEUE_NAME: 'posts'
 DB_STRING: 'postgresql://user:qwerty@db:5432/mydbname'

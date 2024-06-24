@@ -16,8 +16,8 @@ class BrokerManager:
                 self.channel.queue_declare(queue=self.queue_name)
                 break
             except pika.exceptions.AMQPConnectionError as e:
-                print(f"Connection error: {e}. Retrying in 5 seconds...")
-                time.sleep(5)
+                print(f"Connection error: {e}. Retrying in 3 seconds...")
+                time.sleep(3)
 
 
     def set_callback(self, callback):
@@ -38,9 +38,21 @@ class BrokerManager:
         while True:
             try:
                 self.channel.basic_publish(exchange='', routing_key=self.queue_name, body=msg)
+                break
             except pika.exceptions.AMQPConnectionError as e:
                 print(f"Connection error while sending message: {e}. Reconnecting...")
                 self.connect_to_broker()
+
+    def start_consuming(self):
+        while True:
+            try:
+                self.channel.start_consuming()
+                break
+            except pika.exceptions.AMQPConnectionError as e:
+                print(f"Connection error: {e}. Retrying in 2 seconds...")
+                time.sleep(2)
+                self.connect_to_broker()
+                self.set_callback(self.callback)
 
 
     def close(self):

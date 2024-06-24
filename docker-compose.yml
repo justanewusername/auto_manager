@@ -3,17 +3,17 @@ version: '3'
 services:    
     data_preparing_service:
         container_name: data_preparing_service
+        # restart: always
         build:
             context: ./data_preparing_service
             dockerfile: Dockerfile
         depends_on:
-            db:
-                condition: service_healthy
             broker:
                 condition: service_healthy
 
     parser_service:
         container_name: parser_service
+        # restart: always
         build:
             context: ./parser_service
             dockerfile: Dockerfile
@@ -27,6 +27,7 @@ services:
     
     api:
         container_name: api_service
+        # restart: always
         build:
             context: ./api_service
             dockerfile: Dockerfile
@@ -41,6 +42,7 @@ services:
 
     frontend:
         container_name: frontend
+        # restart: always
         build: ./frontend_service
         volumes:
           - frontend_node_modules:/app/frontend/node_modules
@@ -52,6 +54,7 @@ services:
     db:
         container_name: db
         image: postgres:latest
+        # restart: always
         environment:
             POSTGRES_DB: mydbname
             POSTGRES_USER: user
@@ -70,6 +73,7 @@ services:
         container_name: broker
         image: rabbitmq
         command: rabbitmq-server
+        # restart: always
         expose:
             - 5672:5672
             - 15672:15672
@@ -78,6 +82,17 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
+
+    tg:
+        container_name: tg_service
+        # restart: always
+        build:
+            context: ./telegram_service
+            dockerfile: Dockerfile
+        depends_on:
+            db:
+                condition: service_healthy
+
 
 volumes:
     frontend_node_modules:

@@ -9,6 +9,7 @@ import NotFound from './components/notFound';
 import SignUp from './components/signup';
 import LogIn from './components/login';
 import config from './config.js';
+import Popup from './components/popup.jsx';
 
 
 
@@ -48,8 +49,6 @@ function App() {
         <Route exact path="/signup" element={<SignUp/>} />
         <Route exact path="/login" element={<LogIn/>} />
         <Route component={NotFound} />
-
-                
       </Routes>
     </div>
   );

@@ -15,4 +15,4 @@ RUN poetry config virtualenvs.create false && poetry install --no-interaction --
 
 
 
-CMD ["poetry", "run", "python", "./main.py"]
+CMD ["poetry", "run", "python", "-u", "./main.py"]

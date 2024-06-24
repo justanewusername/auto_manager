@@ -1,8 +1,7 @@
 import React, {useState} from "react";
 import './signup.css';
-import axios from "axios";
-import config from "../config";
 import { useNavigate } from 'react-router-dom';
+import { register } from "../api";
 
 const SignUp = (props) => {
     const navigate = useNavigate();
@@ -20,7 +19,7 @@ const SignUp = (props) => {
         }));
       };
     
-      const handleSubmit = (e) => {
+      const handleSubmit = async (e) => {
         e.preventDefault();
         const userData = {
           "email": formData.email, 
@@ -28,16 +27,15 @@ const SignUp = (props) => {
         };
 
         console.log('i send: ', userData);
-
-        axios.post(config.apiUrl + "/auth/signup", userData)
-        .then(response => {
-          console.log("auth done")
-          console.log(response.data)
-          navigate('/');
-        })
-        .catch(error => {
-          console.error("Error signup:", error);
-        });
+        
+        await register(userData)
+          .then(
+            (result) => {
+              console.log("auth done")
+              console.log(result)
+              navigate('/');
+          })
+          .catch(error => console.log(error))
         console.log(formData);
       };
 

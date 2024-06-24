@@ -1,36 +1,30 @@
 import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import Tile from "./tile";
 import './postContainer.css';
-import axios from "axios";
 import config from "../config.js";
+import { getAllTitles } from "../api.js";
 
 const PostsContainer = forwardRef((props, ref) => {
     const [posts, setPosts] = useState([]);
-    // const [tiles, setTiles] = useState();
     let tiles = [ ];    
 
     const getPosts = useCallback(() => {
+      let isFavorites = false;
+      if(props.url === config.apiUrl + "/favorites") {
+        isFavorites = true;
+      }
       console.log("get posts!!!!")
-      console.log(props.url)
-      axios.get(props.url)
-      .then(response => {
-        console.log("####")
-        console.log(response.data)
-        response.data.forEach(x => console.log(x.resource));
-
-        if(props.url === config.apiUrl + "/favorites") {
-          let temp = response.data
-          temp = temp.filter(obj => obj['in_favorites'] === true)
-          setPosts(temp);
-          console.log(temp)
-        } else {
-          setPosts(response.data);
-        }
-
-      })
-      .catch(error => {
-        console.error("Error fetching posts:", error);
-      });
+      getAllTitles()
+        .then((result) => {
+          if(isFavorites === true) {
+            let temp = result
+            temp = temp.filter(obj => obj['in_favorites'] === true)
+            setPosts(temp);
+            console.log(temp)
+          } else {
+            setPosts(result);
+          }
+        })
     }, [props.url]);
 
     useEffect(() => {
@@ -49,11 +43,6 @@ const PostsContainer = forwardRef((props, ref) => {
     const handleTileDelete = (tileId) => {
         getPosts();
       };
-
-    // useEffect(() => {
-    //     // Fetch posts from the external API
-    //     getPosts()
-    // }, [props.url, getPosts]);
     
     tiles = posts.map((post, index) => (
       <Tile key={index}
@@ -62,7 +51,7 @@ const PostsContainer = forwardRef((props, ref) => {
             refresh={getPosts}
             title={post.title}
             url={post.url}
-            in_favorite={post.in_favorites} />
+            inFavorites={post.in_favorites} />
     ));
   
     return (

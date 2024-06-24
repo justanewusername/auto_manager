@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import './control.css';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import config from "../config.js";
 import Cookies from 'js-cookie'
+import usePostStore from "../postStore.js";
+import { logout, runTitleParser } from "../api.js";
 
 function Control({ changePage, onRefreshClick, setFilter }) {
     const [selectedResourceOption, setSelectedResourceOption] = useState("all");
     const [selectedTypeOption, setSelectedTypeOption] = useState("all");
     const [response, setResponse] = useState(null);
     const [counter, setCounter] = useState(0);
+    const setPost = usePostStore((state) => state.setPost);
 
     const resourcesOptions = [
         "all", 
@@ -35,81 +37,75 @@ function Control({ changePage, onRefreshClick, setFilter }) {
     }
 
     // websockets
-    const [messages, setMessages] = useState([]);
   
     useEffect(() => {
-        console.log("hello");
         // Create WebSocket connection.
-        const socket = new WebSocket(config.apiWS + '/posts/progress/ws');
-        socket.onopen = () => {
-            console.log("sending message...");
-            socket.send(JSON.stringify({ 
-                token: Cookies.get('token')
-            }));
-            console.log("message sended");
-        };
+        let socket;
+        try {
+            socket = new WebSocket(config.apiWS + '/posts/progress/ws');
 
-        // Connection opened
-        socket.addEventListener('open', (event) => {
-            console.log('Connected to WebSocket server');
-        });
-  
-        // Listen for messages
-        socket.addEventListener('message', (event) => {
-            console.log('Message from server ', event.data);
-            setMessages([event.data]);
-        });
-
-        // Handle connection close
-        socket.addEventListener('close', (event) => {
-            console.log('WebSocket is closed now.');
+            socket.onopen = () => {
+                console.log("sending message...");
+                socket.send(JSON.stringify({ 
+                    token: Cookies.get('token')
+                }));
+                console.log("message sended");
+            };
+    
+            // Connection opened
+            socket.addEventListener('open', (event) => {
+                console.log('Connected to WebSocket server');
+            });
+      
+            // Listen for messages
+            socket.addEventListener('message', (event) => {
+                const recivedData = JSON.parse(event.data);
+                console.log('****: ', recivedData.type);
+                console.log('*******: ', recivedData['type']);
+                console.log(typeof recivedData)
+                console.log('Message from server: ', recivedData);
+                if(recivedData.type === 'post') {
+                    console.log("jajajajaja")
+                    setPost(recivedData['message']);
+                }
+                else {
+                    console.log("chochochocho")
+                }
+            });
+    
+            // Handle connection close
+            socket.addEventListener('close', (event) => {
+                console.log('WebSocket is closed now.');
+                const reconnect = () => {
+                    setCounter(counter + 1);
+                }
+                setTimeout(reconnect, 4000);
+            });
+      
+            // Handle errors
+            socket.addEventListener('error', (event) => {
+                console.error('WebSocket error observed:', event);
+            });
+        } catch {
             const reconnect = () => {
                 setCounter(counter + 1);
             }
-            setTimeout(reconnect, 5000);
-        });
-  
-        // Handle errors
-        socket.addEventListener('error', (event) => {
-            console.error('WebSocket error observed:', event);
-        });
+            setTimeout(reconnect, 2000);
+            return;
+        }
+
     
         // Clean up the socket connection when the component unmounts
         return () => {
+            console.log('ttttt ', socket);
             socket.close();
         };
     }, [counter]);
 
 
     const postData = async () => {
-        try {
-          console.log('@@@@@@@@@@@@@@@@@');
-          console.log(selectedResourceOption);
-          const token = 'Bearer ' + Cookies.get('token');
-          console.log(token);
-          const response = await axios.post(
-            config.apiUrl + '/posts/titles/test',
-            {
-                resources: [selectedResourceOption],
-                urls: [],
-                period_days: 10,
-            },
-            {
-                headers: {
-                    'Authorization': token
-                }
-            }
-          ).then(response => {
-            console.log(response.data);
-            setResponse(response.data);
-          })
-          .catch(error => {
-            console.error("Pars error!!!:", error);
-          });
-          // Set the response in the state
-        } catch (error) {
-          console.error("Error:", error);
-        }
+        runTitleParser(selectedResourceOption)
+            .then(result => setResponse(response.data));
     };
 
     const onMainPageSet = () => {
@@ -120,8 +116,8 @@ function Control({ changePage, onRefreshClick, setFilter }) {
         changePage("favorites");
     };
 
-    const logout = () => {
-        Cookies.set('token', '');
+    const doLogout = () => {
+        logout();
     }
 
     return (
@@ -164,7 +160,7 @@ function Control({ changePage, onRefreshClick, setFilter }) {
                 <div className="button-signin">
                     <Link to="/signup">Sign In</Link>
                 </div>
-                <div className="button-logout" onClick={logout}>Log Out</div>
+                <div className="button-logout" onClick={doLogout}>Log Out</div>
             </div>
 
             <div className="panel__right">

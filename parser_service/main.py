@@ -33,18 +33,21 @@ class Main:
         print('RECIVED')
         
         msg = json.loads(body)
+        print('user id: ', msg['user_id'])
 
         if msg['type'] == 'titles':
             print('TITLES!!!')
             multi_parser = MultiParser()
             multi_parser.run_title_parser(resources=msg['resources'], user_id=msg['user_id'])
+        elif msg['type'] == 'articles':
+            multi_parser = MultiParser()
+            multi_parser.run_article_parser(msg['resources'], msg['user_id'])
         elif msg['resources'] in ['all', 'Scientificamerican', 'MIT', 'Extremetech']:
             multi_parser = MultiParser()
             multi_parser.run(site=msg['resource'])
         else:
             multi_parser = MultiParser()
             multi_parser.run()
-        print("__________END__________")
         print("__________END__________")
         print("__________END__________")
         print("__________END__________")

@@ -27,6 +27,26 @@ class DatabaseManager:
             password = Column(String, nullable=False)
             websocket_connection = Column(String, nullable=True)
 
+        class TelegramUsers(self.Base):
+            __tablename__ = "telegram_users"
+            id = Column(Integer, primary_key=True)
+            telegram_user_id = Column(Integer, nullable=False, unique=True)
+
+
+        class Answers(self.Base):
+            __tablename__ = "answers"
+            id = Column(Integer, primary_key=True)
+            post_id = Column(Integer, ForeignKey("posts.id"), unique=False)
+            answer = Column(String, nullable=False)
+
+
+        class PostsMessages(self.Base):
+            __tablename__ = "posts_messages"
+            id = Column(Integer, primary_key=True)
+            post_id = Column(Integer, ForeignKey("posts.id"), unique=False)
+            message_id = Column(Integer, unique=True)
+
+
         class Favorites(self.Base):
             __tablename__ = "favorites"
             id = Column(Integer, primary_key=True)
@@ -37,6 +57,9 @@ class DatabaseManager:
             )
 
         self.Post = Posts
+        self.Answers = Answers
+        self.PostsMessages = PostsMessages
+        self.TelegramUser = TelegramUsers
         self.Favorites = Favorites
         self.Users = Users
         self.Base.metadata.create_all(bind=self.engine)
@@ -88,8 +111,6 @@ class DatabaseManager:
         for item in posts:
             dict_item = {**item[0].__dict__, 'in_favorites': item.in_favorites}
             posts_list.append(dict_item)
-
-        # posts_list = [post.__dict__ for post in posts]
         return posts_list
 
     def delete_all_posts(self):
@@ -240,6 +261,7 @@ class DatabaseManager:
             return None
         return user.websocket_connection
 
+
     def update_websocket_connection_by_id(self, user_id: int, connection: str):
         session = self.SessionLocal()
         try:
@@ -269,5 +291,137 @@ class DatabaseManager:
         except Exception as e:
             session.rollback()
             return {"message": str(e)}
+        finally:
+            session.close()
+
+
+    # TELEGRAM USER
+    def create_telegram_user(self, telegram_user_id: int):
+        session = self.SessionLocal()
+        try:
+            new_user = self.TelegramUser(telegram_user_id=telegram_user_id)
+            session.add(new_user)
+
+            session.flush()
+            session.refresh(new_user)
+
+            session.expunge_all()
+            session.commit()
+            session.close()
+            return {"id": new_user.id}
+        except:
+            session.close()
+            return None
+    
+
+    def check_telegram_user_by_id(self, telegram_user_id: int):
+        session = self.SessionLocal()
+        try:
+            telegram_user = session.query(self.TelegramUser).filter(self.TelegramUser.telegram_user_id == telegram_user_id).first()
+            session.expunge_all()
+            session.close()
+            if telegram_user is None:
+                return False
+            return True
+        except:
+            session.close()
+
+    
+    def get_all_telegram_users(self):
+        session = self.SessionLocal()
+
+        telegram_users = session.query(self.TelegramUser).all()
+
+        session.expunge_all()
+        session.close()
+        if telegram_users is None:
+            return None
+
+        telegram_users_list = []
+        for item in telegram_users:
+            telegram_users_list.append(item.telegram_user_id)
+        return telegram_users_list
+    
+    def delete_telegram_user(self, user_id: int):
+        session = self.SessionLocal()
+        try:
+            user_to_delete = session.query(self.TelegramUser).filter_by(user_id=user_id).first()
+
+            if user_to_delete:
+                session.delete(user_to_delete)
+                session.commit()
+                return {"message": f"Telegram user with user_id {user_id} deleted successfully"}
+            else:
+                return {"message": f"No telegram user found with {user_id}"}
+        except Exception as e:
+            session.rollback()
+            raise e
+        finally:
+            session.close()
+
+    # TELEGRAM MESSAGES AND ANSWERS
+
+    def add_message_id(self, post_id: int, message_id: int):
+        session = self.SessionLocal()
+        try:
+            new_post_message = self.PostsMessages(post_id=post_id, message_id=message_id)
+            session.add(new_post_message)
+            
+            session.flush()
+            session.refresh(new_post_message)
+
+            session.expunge_all()
+            session.commit()
+        except:
+            pass
+        session.close()
+        return
+    
+
+    def get_post_id_by_message_id(self, message_id: int):
+        session = self.SessionLocal()
+        try:
+            post_message = session.query(self.PostsMessages).filter(self.PostsMessages.message_id == message_id).first()
+            session.expunge_all()
+            session.close()
+            if post_message is None:
+                return None
+            return post_message.post_id
+        except:
+            session.close()
+    
+
+    def add_answer(self, post_id: int, answer: str):
+        session = self.SessionLocal()
+        try:
+            new_answwer = self.Answers(post_id=post_id, answer=answer)
+            session.add(new_answwer)
+
+            session.flush()
+            session.refresh(new_answwer)
+
+            session.expunge_all()
+            session.commit()
+        except:
+            pass
+        finally:
+            session.close()
+        return
+
+
+    def delete_answer(self, answer_id: int):
+        session = self.SessionLocal()
+        try:
+            answer_to_delete = session.query(self.Answers).filter_by(id=answer_id).first()
+
+            if answer_to_delete:
+                session.delete(answer_to_delete)
+                session.commit()
+                return {"message": f"Telegram user with user_id {answer_id} deleted successfully"}
+            else:
+                return {"message": f"No telegram user found with {answer_id}"}
+        except Exception as e:
+            session.rollback()
+            raise e
         finally:
             session.close()

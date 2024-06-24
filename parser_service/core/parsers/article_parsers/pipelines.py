@@ -28,6 +28,24 @@ class CleaningPipeline:
         num_tokens = len(encoding.encode(string))
         return num_tokens
 
+# class BrokerPipeline:
+#     def process_item(self, item, spider):
+#         if 'content' in item:
+#             soup = BeautifulSoup(item['content'], 'html.parser')
+#             if soup.find(True):
+#                 return ""
+#             queue_name = 'articles'
+#             broker = BrokerManager(queue_name, 'broker')
+#             msg = json.dumps({'content': item['content'], 
+#                               'title': item['title'], 
+#                               'url': item['url'], 
+#                               'destination': 'posts',
+#                               'category': item['category'],
+#                               'resource': item['resource']})
+#             broker.send_msg(msg)
+#             broker.close()
+#         return item
+
 class BrokerPipeline:
     def process_item(self, item, spider):
         if 'content' in item:
@@ -36,16 +54,13 @@ class BrokerPipeline:
                 return ""
             queue_name = 'articles'
             broker = BrokerManager(queue_name, 'broker')
-            msg = json.dumps({'content': item['content'], 
-                              'title': item['title'], 
-                              'url': item['url'], 
+            msg = json.dumps({'content': item['content'],
+                              'user_id': item['user_id'],
                               'destination': 'posts',
-                              'category': item['category'],
-                              'resource': item['resource']})
+                              })
             broker.send_msg(msg)
             broker.close()
         return item
-
 
 class RequestSenderPipeline:
     def process_item(self, item, spider):
