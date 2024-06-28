@@ -91,17 +91,13 @@ async def create_item(item: Item):
 connected_websockets = {}
 
 async def send_message(user_id:int, message: str, message_type: str):
-    print("7777777777777: ", user_id)
-    print('8888888888888: ', message_type)
     if str(user_id) in connected_websockets:
-        print('hi!')
         msg = json.dumps({'message': message, 'type': message_type})
         ws_connection = connected_websockets[str(user_id)]
         await ws_connection.send_text(msg)
 
 @router.websocket("/posts/progress/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    print("wow")
     await websocket.accept()
     try:
         while True:
@@ -113,7 +109,6 @@ async def websocket_endpoint(websocket: WebSocket):
             # getting user email
             user = get_current_user(data['token'])
             if user is None:
-                print("fuck")
                 return
             
             # saving in dict
@@ -137,18 +132,12 @@ async def get_titles_from_db():
     db = DatabaseManager(config['DB_CONNECTION'])
     posts = db.get_all_posts()
     print('sending (', len(posts), ' items)...')
-    print(posts)
     return posts
 
 
 # DONE
 @router.post("/posts/titles/test")
 async def parse_titles(request: ParseTitlesRequest, user: SystemUser = Depends(get_current_user_impl)):
-    print('hallo!!!')
-    print(request.resources)
-    print(request.urls)
-    print(request.period_days)
-
     parsers = {
         'SCIENTIFICAMERICAN': 'https://www.scientificamerican.com/artificial-intelligence/',
         'MIT': 'https://news.mit.edu/topic/artificial-intelligence2',
@@ -169,8 +158,6 @@ async def parse_titles(request: ParseTitlesRequest, user: SystemUser = Depends(g
 
     for item in request.urls:
         processed_urls.append(item)
-    
-    print('wow, i can get id: ', user.id)
 
     msg = json.dumps({'type': 'titles',
                       'resources': processed_urls, 
@@ -200,7 +187,6 @@ async def parse_titles(request: ParseArticleRequest, user: SystemUser = Depends(
                       'resources': request.url,
                       'user_id': user.id
                     })
-    print('33333333333333333333333333333: ', user.id)
     broker = BrokerManager(queue_name, broker_host)
     broker.send_msg(msg)
     broker.close()
@@ -223,3 +209,15 @@ async def create_item(request: PostSchema):
     for message_id in message_id_list:
         db.add_message_id(post_id=request.post_id, message_id=message_id)
     return
+
+@router.get("/answers/all")
+async def get_all_answers():
+    db = DatabaseManager(config['DB_CONNECTION'])
+    result = db.get_all_answers()
+    print('****************************')
+    print('****************************')
+    print('****************************')
+    print(result)
+    if result is None:
+        return []
+    return result

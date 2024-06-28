@@ -4,7 +4,7 @@ import './App.css';
 import Control from './components/header.jsx';
 import Favorites from './components/favorites';
 import PostsContainer from './components/postsContainer';
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NotFound from './components/notFound';
 import SignUp from './components/signup';
@@ -12,6 +12,7 @@ import LogIn from './components/login';
 import config from './config.js';
 import Cookies from 'js-cookie'
 import Filters from './components/filters.jsx';
+import AnswersContainer from './components/answersContainer.jsx';
 
 
 function App() {
@@ -20,6 +21,17 @@ function App() {
   const [resourcefilter, setResourcefilter] =  useState("all");
   const [token, setToken] = useState(Cookies.get('token'));
   const [currentPage, setCurrentPage] = useState('articles');
+
+  const articlesPage = (<>
+    <Filters/>
+    <PostsContainer url={postContainerUrl} filter ={resourcefilter} ref={postContainerRef}/>
+  </>)
+
+  const answersPage = (<AnswersContainer/>);
+
+
+  const [currentElment, setCurrentElement] = useState(articlesPage);
+
 
 
   const refresh = useCallback(() => {
@@ -30,14 +42,6 @@ function App() {
     setResourcefilter(filter);
   }
 
-  // const changePage = (currentPage) => {
-  //   if(currentPage === "main") {
-  //     setPostContainerUrl(config.apiUrl + "/all")
-  //   } else {
-  //     setPostContainerUrl(config.apiUrl + "/favorites")
-  //   }
-  // };
-
   const changeToken = () => {
     setToken(Cookies.get('token'));
   }
@@ -46,10 +50,16 @@ function App() {
     setCurrentPage(page);
   }
 
-  const articlesPage = (<>
-    <Filters/>
-    <PostsContainer url={postContainerUrl} filter ={resourcefilter} ref={postContainerRef}/>
-  </>)
+  useEffect(() => {
+    console.log("2234556666");
+    console.log(currentPage);
+    if(currentPage === 'articles') {
+      setCurrentElement(articlesPage);
+    } else if (currentPage === 'answers') {
+      setCurrentElement(answersPage);
+    }
+  }, [currentPage]);
+
 
   return (
     <div className="App">
@@ -58,7 +68,7 @@ function App() {
                token={token}
                changeCurrentPage={changeCurrentPage}/>
       <Routes>
-        <Route exact path="/" element={articlesPage} />
+        <Route exact path="/" element={currentElment} />
         <Route exact path="/signup" element={<SignUp changeToken={changeToken}/>} />
         <Route exact path="/login" element={<LogIn changeToken={changeToken}/>} />
         <Route component={NotFound} />

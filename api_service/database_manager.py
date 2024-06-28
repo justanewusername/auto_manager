@@ -100,7 +100,7 @@ class DatabaseManager:
     def get_all_posts(self):
         session = self.SessionLocal()
 
-        posts = session.query(self.Post, exists().where(self.Favorites.post_id == self.Post.id).label('in_favorites')).limit(10).all()
+        posts = session.query(self.Post, exists().where(self.Favorites.post_id == self.Post.id).label('in_favorites')).limit(13).all()
 
         session.expunge_all()
         session.close()
@@ -425,3 +425,30 @@ class DatabaseManager:
             raise e
         finally:
             session.close()
+
+    def get_all_answers(self):
+        session = self.SessionLocal()
+        try:
+            answers = session.query(self.Answers, self.Post, self.Post.url).join(self.Post, self.Post.id == self.Answers.post_id).all()
+
+            session.expunge_all()
+            session.close()
+
+            if answers is None:
+                return None
+            
+            answers_list = [
+                {
+                    'answer_id': answer.id,
+                    'answer': answer.answer,
+                    'post_title': title,
+                    'post_url': url
+                }
+                for answer, title, url in answers
+            ]
+
+            return answers_list
+        except Exception as e:
+            print('some error:', e)
+            session.close()
+        return None

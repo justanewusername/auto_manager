@@ -46,6 +46,7 @@
     position: relative;
     width: var(--select-width);
     height: 23px;
+    padding-left: 1px;
   }
 
 
@@ -56,10 +57,10 @@
     -moz-appearance: none;
     -webkit-appearance: none;
     
-    min-width: calc(var(--select-width) - 2px);
+    min-width: calc(var(--select-width) - 3px);
 }
 
 .custom-select select:focus {
-    border: none; /* Убираем border при фокусе */
-    outline: none; /* Убираем outline при фокусе */
+    border: none;
+    outline: none;
 }

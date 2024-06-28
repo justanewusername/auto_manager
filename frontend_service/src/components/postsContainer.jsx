@@ -19,8 +19,9 @@ const PostsContainer = forwardRef((props, ref) => {
           if(isFavorites === true) {
             let temp = result
             temp = temp.filter(obj => obj['in_favorites'] === true)
-            setPosts(temp);
-            console.log(temp)
+            if (result != null) {
+              setPosts(temp);
+            }
           } else {
             setPosts(result);
           }

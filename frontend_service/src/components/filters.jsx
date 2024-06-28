@@ -29,7 +29,7 @@ const Filters = (props) => {
     return(
         <div className='filters'>
             <div className='filters-info'>
-                <p><span>Last updete:</span> {props.lastUpdate}</p>
+                <p><span>Last update:</span> {props.lastUpdate}</p>
                 <p><span>Period:</span> {props.period}</p>
             </div>
             <div className='filters-settings'>

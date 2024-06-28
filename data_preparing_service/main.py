@@ -1,7 +1,7 @@
 from turtle import pos
-# from broker_manager import BrokerManager
+from broker_manager import BrokerManager
 from gpt_manager import GPTManager
-# from database_manager import DatabaseManager
+from database_manager import DatabaseManager
 import json
 import time
 import requests
@@ -24,7 +24,7 @@ def callback(ch, method, properties, body):
         return
     print('sending post...')
     send_post(msg['user_id'], post)
-    send_post(msg['user_id'], msg['content'])
+    # send_post(msg['user_id'], msg['content'])
     print('done')
     
     # db_manager = DatabaseManager('postgresql://user:qwerty@db:5432/mydbname')
@@ -32,13 +32,10 @@ def callback(ch, method, properties, body):
     # print('post saved.')
 
 
-# queue_name = 'articles'
-# broker = BrokerManager(queue_name, 'broker')
-# broker.set_callback(callback)
+queue_name = 'articles'
+broker = BrokerManager(queue_name, 'broker')
+broker.set_callback(callback)
 
 
-# print(' [*] Waiting for messages.')
-# broker.start_consuming()
-
-gpt = GPTManager()
-gpt.get_post(" аьуьмдлмьд ьукдл ьукдлмьукдлмь удкл ьукд")
+print(' [*] Waiting for messages.')
+broker.start_consuming()

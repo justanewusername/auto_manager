@@ -140,3 +140,14 @@ export const removeFromFavorites = async (postId) => {
           console.error("Error deleting from favorites: ", error);
         });
 }
+
+export const getAnswers = async () => {
+    return axios.get(config.apiUrl + '/answers/all')
+        .then(response => {
+            console.log(response);
+            return response.data
+        })
+        .catch(error => {
+            console.error("Error getting answers: ", error);
+        });
+}
