@@ -1,7 +1,7 @@
 from turtle import pos
-from broker_manager import BrokerManager
+# from broker_manager import BrokerManager
 from gpt_manager import GPTManager
-from database_manager import DatabaseManager
+# from database_manager import DatabaseManager
 import json
 import time
 import requests
@@ -14,16 +14,16 @@ def callback(ch, method, properties, body):
     print('msg: ', msg)
     gpt = GPTManager()
     post = ""
-    # try:
-    #     post = gpt.get_post(msg['content'])
-    # except:
-    #     print('oh no!')
-    #     return
-    # if len(post) < 100:
-    #     print('oh no!')
-    #     return
-    # print('sending post...')
-    # send_post(msg['user_id'], post)
+    try:
+        post = gpt.get_post(msg['content'])
+    except:
+        print('oh no!')
+        return
+    if len(post) < 100:
+        print('oh no!')
+        return
+    print('sending post...')
+    send_post(msg['user_id'], post)
     send_post(msg['user_id'], msg['content'])
     print('done')
     
@@ -32,10 +32,13 @@ def callback(ch, method, properties, body):
     # print('post saved.')
 
 
-queue_name = 'articles'
-broker = BrokerManager(queue_name, 'broker')
-broker.set_callback(callback)
+# queue_name = 'articles'
+# broker = BrokerManager(queue_name, 'broker')
+# broker.set_callback(callback)
 
 
-print(' [*] Waiting for messages.')
-broker.start_consuming()
+# print(' [*] Waiting for messages.')
+# broker.start_consuming()
+
+gpt = GPTManager()
+gpt.get_post(" аьуьмдлмьд ьукдл ьукдлмьукдлмь удкл ьукд")

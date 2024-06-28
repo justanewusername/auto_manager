@@ -32,7 +32,7 @@ const SignUp = (props) => {
           .then(
             (result) => {
               console.log("auth done")
-              console.log(result)
+              props.changeToken();
               navigate('/');
           })
           .catch(error => console.log(error))

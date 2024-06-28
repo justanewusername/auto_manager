@@ -56,7 +56,6 @@ const PostsContainer = forwardRef((props, ref) => {
   
     return (
         <div>
-            <p className="container__name">Сгенерированные посты:</p>
             <div className="container" style={{ columnCount: 3 }}>
                 {tiles}
             </div>

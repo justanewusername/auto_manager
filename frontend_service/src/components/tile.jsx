@@ -56,8 +56,8 @@ function Tile(props) {
                 {/* <button className={isInFavorites ? "button_active" : ""} onClick={onFavoritesClick}>
                     {isInFavorites ? "Сохранено в избранном" : "В избранное"}
                 </button> */}
-                <button className="tile__button" onClick={generatePost}>generate post</button>
-                <button className="tile__button">summarize</button>
+                <button className="secondary-btn" onClick={generatePost}>generate post</button>
+                <button className="secondary-btn">summarize</button>
             </div>
         </div>
     );

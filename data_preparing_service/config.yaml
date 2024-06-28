@@ -1,4 +1,4 @@
-GPT_KEY: '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'
+GPT_KEY: 'sk-proj-ii8JO2Hh2BUWOjl7iR9aT3BlbkFJ7VBl60gSmlY4qLVyTeEa'
 GPT_MODEL: 'gpt-3.5-turbo-instruct'
 
 DB_STRING: 'postgresql://user:qwerty@db:5432/mydbname'

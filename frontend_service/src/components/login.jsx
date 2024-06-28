@@ -17,7 +17,10 @@ const LogIn = (props) => {
 
       console.log('i send: ', userData);
 
-      await login(userData).then(result => navigate('/'));
+      await login(userData).then(result => {
+        props.changeToken();
+        navigate('/');
+      });
 
       console.log('Submitted:', email, password);
     };
