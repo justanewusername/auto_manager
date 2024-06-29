@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, Column, Integer, String, or_, ForeignKey, UniqueConstraint, exists
-from sqlalchemy.orm import sessionmaker, mapped_column
+from sqlalchemy.orm import sessionmaker, mapped_column, aliased
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -430,7 +430,7 @@ class DatabaseManager:
     def get_all_answers(self):
         session = self.SessionLocal()
         try:
-            answers = session.query(self.Answers, self.Post, self.Post.url).join(self.Post, self.Post.id == self.Answers.post_id).all()
+            answers = session.query(self.Answers, self.Post.title.label('title'), self.Post.url.label('url')).join(self.Post, self.Post.id == self.Answers.post_id).all()
 
             session.expunge_all()
             session.close()

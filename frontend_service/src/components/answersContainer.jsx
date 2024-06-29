@@ -11,6 +11,7 @@ const AnswersContainer = (props) => {
         await getAnswers().then((result) => {
             if (result != null) {
                 setAnswers(result);
+                console.log(result);
             }
         })
     }
@@ -19,6 +20,7 @@ const AnswersContainer = (props) => {
         await getAllTitles().then(result => {
             if (result != null) {
                 setAnswers(result);
+                console.log(result);
             }
         });
     }
@@ -32,7 +34,7 @@ const AnswersContainer = (props) => {
       }, []);
 
     tiles = answers.map((answer, index) => (
-        <AnswerTile answer={answer.answer} key={index}/>
+        <AnswerTile answer={answer.answer} title={answer.title} url={answer.url} key={index}/>
     ))
 
     return (
