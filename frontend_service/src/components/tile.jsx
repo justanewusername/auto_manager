@@ -25,7 +25,6 @@ function Tile(props) {
     
         document.addEventListener('mousedown', handleClickOutside);
     
-        // Убираем обработчик события при размонтировании компонента
         return () => {
           document.removeEventListener('mousedown', handleClickOutside);
         };
@@ -53,9 +52,6 @@ function Tile(props) {
             <h3 className="tile_title">{props.title}</h3>
             <div className="button_container">
                 <a className="tile_source" target="_blank" rel="noreferrer" href={props.url}>view source</a>
-                {/* <button className={isInFavorites ? "button_active" : ""} onClick={onFavoritesClick}>
-                    {isInFavorites ? "Сохранено в избранном" : "В избранное"}
-                </button> */}
                 <button className="secondary-btn" onClick={generatePost}>generate post</button>
                 <button className="secondary-btn" onClick={generatePost}>summarize</button>
             </div>

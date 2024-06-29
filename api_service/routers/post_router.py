@@ -169,7 +169,7 @@ async def parse_titles(request: ParseTitlesRequest, user: SystemUser = Depends(g
     broker.send_msg(msg)
     broker.close()
     print("отправленно!!!!!!!!")
-    return {"message": "Запрос успешно обработан"}
+    return {"message": "Request processed successfully"}
 
 
 @router.post("/posts/sendprogress")

@@ -52,7 +52,7 @@ const Popup = forwardRef((props, ref) => {
             </div>
             <div className="button_panel">
                 <button onClick={edit}>edit</button>
-                <button onClick={save}>save</button>
+                <button onClick={save}>{isInFavorites ? "saved" : "save"}</button>
                 <button onClick={getPost}>generate again</button>
                 <button onClick={sendToTg}>send to Tg. bot</button>
             </div>

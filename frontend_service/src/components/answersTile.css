@@ -1,5 +1,6 @@
 .answers-tile {
     display: flex;
+    width: var(--main-container-width);
     flex-direction: column;
     border: 1px solid black;
     position: relative;

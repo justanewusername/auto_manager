@@ -34,7 +34,7 @@ const AnswersContainer = (props) => {
       }, []);
 
     tiles = answers.map((answer, index) => (
-        <AnswerTile answer={answer.answer} title={answer.title} url={answer.url} key={index}/>
+        <AnswerTile answer={answer.answer} title={answer.post_title} url={answer.post_url} key={index}/>
     ))
 
     return (
