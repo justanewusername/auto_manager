@@ -23,6 +23,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState('articles');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [resourceFilter, setResourceFilter] = useState('all');
+  const [isFavorites, setIsFavorites] = useState(false);
 
   const changeResource = (resourse) => {
     setResourceFilter(resourse);
@@ -32,12 +33,22 @@ function App() {
     setCategoryFilter(category);
   }
 
-  const articlesPage = (<>
+  let articlesPage = (<>
     <Filters changeResource={changeResource} changeCategorie={changeCategorie}/>
-    <PostsContainer categoryFilter={categoryFilter} resourceFilter={resourceFilter} url={postContainerUrl} filter ={resourcefilter} ref={postContainerRef}/>
+    <PostsContainer isFavorites={isFavorites} categoryFilter={categoryFilter} resourceFilter={resourceFilter} url={postContainerUrl} filter ={resourcefilter} ref={postContainerRef}/>
   </>)
 
-  const answersPage = (<AnswersContainer/>);
+  useEffect(() => {
+    articlesPage = (<>
+      <Filters changeResource={changeResource} changeCategorie={changeCategorie}/>
+      <PostsContainer isFavorites={isFavorites} categoryFilter={categoryFilter} resourceFilter={resourceFilter} url={postContainerUrl} filter ={resourcefilter} ref={postContainerRef}/>
+    </>)
+    setCurrentElement(articlesPage);
+  }, [resourceFilter, categoryFilter])
+
+  const answersPage = (<AnswersContainer isSummary={false}/>);
+
+  const summaryPage = (<AnswersContainer isSummary={true}/>);
 
 
   const [currentElment, setCurrentElement] = useState(articlesPage);
@@ -64,9 +75,23 @@ function App() {
     console.log("2234556666");
     console.log(currentPage);
     if(currentPage === 'articles') {
+      setIsFavorites(false);
+      articlesPage = (<>
+        <Filters changeResource={changeResource} changeCategorie={changeCategorie}/>
+        <PostsContainer isFavorites={false} categoryFilter={categoryFilter} resourceFilter={resourceFilter} url={postContainerUrl} filter ={resourcefilter} ref={postContainerRef}/>
+      </>)
       setCurrentElement(articlesPage);
     } else if (currentPage === 'answers') {
       setCurrentElement(answersPage);
+    } else if (currentPage === 'savedPosts') {
+      setIsFavorites(true);
+      articlesPage = (<>
+        <Filters changeResource={changeResource} changeCategorie={changeCategorie}/>
+        <PostsContainer isFavorites={true} categoryFilter={categoryFilter} resourceFilter={resourceFilter} url={postContainerUrl} filter ={resourcefilter} ref={postContainerRef}/>
+      </>)
+      setCurrentElement(articlesPage);
+    } else if (currentPage === 'savedSummary') {
+      setCurrentElement(summaryPage);
     }
   }, [currentPage]);
 

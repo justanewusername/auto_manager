@@ -151,3 +151,13 @@ export const getAnswers = async () => {
             console.error("Error getting answers: ", error);
         });
 }
+
+export const updateSummary = async (postId, summary) => {
+    return axios.post(config.apiUrl + "/posts/summary/", {user_id: postId, content: summary})
+        .then(response => {
+            return response.data;
+        })
+        .catch(error => {
+          console.error("Error updating summary", error);
+        });
+}

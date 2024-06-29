@@ -17,11 +17,9 @@ class UniversalArticleParser(scrapy.Spider):
         self.start_urls = kwargs.get('start_urls', ['https://www.scientificamerican.com/artificial-intelligence/'])
         self.days = kwargs.get('days', 20)
         self.user_id = kwargs.get('user_id', None)
-        print('11111111111111111111111111111111111111111111111111')
     
     def parse(self, response):
             article_text = self.get_article_text(response)
-            print('22222222222222222222222222222222222222222222222222222222222')
             yield {
                 'content': article_text,
                 'user_id': self.user_id,

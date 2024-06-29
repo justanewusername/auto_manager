@@ -1,9 +1,9 @@
-import { getAnswers } from '../api';
+import { getAllTitles, getAnswers } from '../api';
 import AnswerTile from './answerTile';
 import './answersContainer.css';
 import React, {useEffect, useState} from "react";
 
-const AnswersContainer = () => {
+const AnswersContainer = (props) => {
     const [answers, setAnswers] = useState([]);
     let tiles = [];
 
@@ -15,8 +15,20 @@ const AnswersContainer = () => {
         })
     }
 
+    const getAllSummary = async () => {
+        await getAllTitles().then(result => {
+            if (result != null) {
+                setAnswers(result);
+            }
+        });
+    }
+
     useEffect(() => {
-        getAllAnswers();
+        if(props.isSummary == true) {
+            getAllSummary();
+        } else {
+            getAllAnswers();
+        }
       }, []);
 
     tiles = answers.map((answer, index) => (

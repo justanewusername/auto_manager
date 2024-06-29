@@ -453,3 +453,20 @@ class DatabaseManager:
             print('some error:', e)
             session.close()
         return None
+
+
+    def update_summary(self, post_id: int, summary: str):
+        session = self.SessionLocal()
+        try:
+            post = session.query(self.Post).filter_by(id=post_id).first()
+            if post:
+                post.summary = summary
+                session.commit()
+                return {"message": "Summary updated successfully"}
+            else:
+                return {"message": "Post not found"}
+        except Exception as e:
+            session.rollback()
+            return {"message": str(e)}
+        finally:
+            session.close()

@@ -214,10 +214,13 @@ async def create_item(request: PostSchema):
 async def get_all_answers():
     db = DatabaseManager(config['DB_CONNECTION'])
     result = db.get_all_answers()
-    print('****************************')
-    print('****************************')
-    print('****************************')
-    print(result)
     if result is None:
         return []
     return result
+
+
+@router.post("/posts/summary")
+async def create_item(request: PostRequest):
+    db = DatabaseManager(config['DB_CONNECTION'])
+    db.update_summary(post_id=request.user_id, summary=request.content)
+    return

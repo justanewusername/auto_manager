@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useCallback, forwardRef, useRef, useImperativeHandle } from "react";
 import Tile from "./tile";
 import './postContainer.css';
-import config from "../config.js";
 import { getAllTitles } from "../api.js";
 
 const PostsContainer = forwardRef((props, ref) => {
+    console.log('*****', props.isFavorites);
     const internalRef = useRef();
     const [posts, setPosts] = useState([]);
-    let tiles = [ ];    
+    const [resourceFilter, setResourceFilter] = useState(props.resourceFilter);
+    const [tiles, setTiles]  = useState([]);    
 
-    const getPosts = useEffect(() => {
+    const getPosts = () => {
       let isFavorites = false;
-      if(props.url === config.apiUrl + "/favorites") {
+      if(props.isFavorites === true) {
         isFavorites = true;
       }
       console.log("get posts!!!!")
@@ -30,10 +31,24 @@ const PostsContainer = forwardRef((props, ref) => {
               }
             }
           } else {
-            setPosts(result);
+            if(result != null) {
+              setPosts(result);
+              if(props.resourceFilter.toUpperCase() !== "ALL") {
+                setPosts(posts.filter(obj => obj['resource'] === props.resourceFilter))
+              }
+              if(props.categoryFilter.toUpperCase() !== "ALL") {
+                setPosts(posts.filter(obj => obj['category'] === props.categoryFilter))
+              }
+            }
           }
         })
-    }, []);
+    };
+
+    useEffect(()=>{
+      console.log('ijfrirjifj');
+      console.log(props.resourceFilter)
+      getPosts();
+    },[props.resourceFilter, props.categoryFilter, props.isFavorites]);
 
 
     useImperativeHandle(ref, () => ({
@@ -44,15 +59,20 @@ const PostsContainer = forwardRef((props, ref) => {
         getPosts();
       };
     
-    tiles = posts.map((post, index) => (
-      <Tile key={index}
-            tileId={post.id}
-            onDelete={handleTileDelete}
-            refresh={getPosts}
-            title={post.title}
-            url={post.url}
-            inFavorites={post.in_favorites} />
-    ));
+    // useEffect(()=> {},[props.resourceFilter, props.categoryFilter, props.isFavorites]);
+
+    useEffect(()=> {
+      setTiles(posts.map((post, index) => (
+        <Tile key={index}
+              tileId={post.id}
+              onDelete={handleTileDelete}
+              refresh={getPosts}
+              title={post.title}
+              url={post.url}
+              inFavorites={post.in_favorites} />
+      )));
+    }, [posts]);
+  
   
     return (
         <div ref={internalRef}>

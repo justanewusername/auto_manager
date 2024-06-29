@@ -3,46 +3,46 @@ version: '3'
 services:    
     data_preparing_service:
         container_name: data_preparing_service
-        # restart: always
+        restart: always
         build:
             context: ./data_preparing_service
             dockerfile: Dockerfile
-        depends_on:
-            broker:
-                condition: service_healthy
+        # depends_on:
+        #     broker:
+        #         condition: service_healthy
 
     parser_service:
         container_name: parser_service
-        # restart: always
+        restart: always
         build:
             context: ./parser_service
             dockerfile: Dockerfile
         ports:
             - 8020:8080
-        depends_on:
-            data_preparing_service:
-                condition: service_started
-            broker:
-                condition: service_healthy
+        # depends_on:
+        #     data_preparing_service:
+        #         condition: service_started
+        #     broker:
+        #         condition: service_healthy
     
     api:
         container_name: api_service
-        # restart: always
+        restart: always
         build:
             context: ./api_service
             dockerfile: Dockerfile
         ports:
             - 8811:81
-        depends_on:
-            data_preparing_service:
-                condition: service_started
-            broker:
-                condition: service_healthy
+        # depends_on:
+        #     data_preparing_service:
+        #         condition: service_started
+        #     broker:
+        #         condition: service_healthy
         command: "poetry run uvicorn main:app --host 0.0.0.0 --port 81"
 
     frontend:
         container_name: frontend
-        # restart: always
+        restart: always
         build: ./frontend_service
         volumes:
           - frontend_node_modules:/app/frontend/node_modules
@@ -54,18 +54,18 @@ services:
     db:
         container_name: db
         image: postgres:latest
-        # restart: always
+        restart: always
         environment:
             POSTGRES_DB: mydbname
             POSTGRES_USER: user
             POSTGRES_PASSWORD: qwerty
         ports:
           - "5432:5432"
-        healthcheck:
-            test: ["CMD", "pg_isready", "-q", "-d", "mydbname", "-U", "user"]
-            interval: 5s
-            timeout: 3s
-            retries: 3
+        # healthcheck:
+        #     test: ["CMD", "pg_isready", "-q", "-d", "mydbname", "-U", "user"]
+        #     interval: 5s
+        #     timeout: 3s
+        #     retries: 3
         # volumes:
         #     - postgres_auto_manager:/var/lib/postgresql/data
 
@@ -73,25 +73,27 @@ services:
         container_name: broker
         image: rabbitmq
         command: rabbitmq-server
-        # restart: always
+        restart: always
         expose:
             - 5672:5672
             - 15672:15672
-        healthcheck:
-            test: rabbitmq-diagnostics -q ping
-            interval: 30s
-            timeout: 30s
-            retries: 3
+        # healthcheck:
+        #     test: rabbitmq-diagnostics -q ping
+        #     interval: 30s
+        #     timeout: 30s
+        #     retries: 3
 
     tg:
         container_name: tg_service
-        # restart: always
+        restart: always
+        ports:
+            - 443:443
         build:
             context: ./telegram_service
             dockerfile: Dockerfile
-        depends_on:
-            db:
-                condition: service_healthy
+        # depends_on:
+        #     db:
+        #         condition: service_healthy
 
 
 volumes:
