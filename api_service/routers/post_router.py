@@ -162,7 +162,7 @@ async def parse_titles(request: ParseTitlesRequest, user: SystemUser = Depends(g
     msg = json.dumps({'type': 'titles',
                       'resources': processed_urls, 
                       'period_days': request.period_days,
-                      'user_id': user.id
+                      'user_id': user.id,
                     })
     
     broker = BrokerManager(queue_name, broker_host)

@@ -25,6 +25,34 @@ class UniversalTitleParser(scrapy.Spider):
 
     
     def parse(self, response):
+        categories = {
+            'https://www.scientificamerican.com/artificial-intelligence/': 'AI',
+            'https://news.mit.edu/topic/artificial-intelligence2': 'Tech',
+            'https://www.extremetech.com/tag/artificial-intelligence': 'AI',
+            'https://venturebeat.com/category/ai/': 'AI',
+            'https://gizmodo.com/moderna-ceo-chatgpt-employees-vaccines-openai-1851435620': 'AI',
+            'https://syncedreview.com/category/popular/': 'Tech',
+        }
+
+        resources = {
+            'https://www.scientificamerican.com/artificial-intelligence/': 'SCIENTIFICAMERICAN',
+            'https://news.mit.edu/topic/artificial-intelligence2': 'MIT',
+            'https://www.extremetech.com/tag/artificial-intelligence': 'EXTREMETECH',
+            'https://venturebeat.com/category/ai/': 'VENTUREBEAT',
+            'https://gizmodo.com/moderna-ceo-chatgpt-employees-vaccines-openai-1851435620': 'GIZMODO',
+            'https://syncedreview.com/category/popular/': 'SYNCED',
+        }
+        
+        print('YYYYYYYYYYYYYYYYYY')
+        print('YYYYYYYYYYYYYYYYYY')
+        print(response.url)
+        print(categories[response.url])
+        print(resources[response.url])
+        print('YYYYYYYYYYYYYYYYYY')
+
+        self.category = categories[response.url]
+        self.resource = resources[response.url]
+
         ARTICLE_TAG = 'article'
         days_difference = self.days
 

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import './header.css';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import config from "../config.js";
 import Cookies from 'js-cookie'
 import usePostStore from "../postStore.js";
 import { logout, runTitleParser } from "../api.js";
 
 
+
 function Header({ changeCurrentPage, onRefreshClick, setFilter, token }) {
+    const navigate = useNavigate();
+    const location = useLocation();
     const [selectedResourceOption, setSelectedResourceOption] = useState("all");
     const [selectedTypeOption, setSelectedTypeOption] = useState("all");
     const [response, setResponse] = useState(null);
@@ -19,29 +22,6 @@ function Header({ changeCurrentPage, onRefreshClick, setFilter, token }) {
     useEffect(() => {
         setJWTToken(token);
     }, [token]);
-
-    const resourcesOptions = [
-        "all", 
-        "scientificamerican", 
-        "MIT", 
-        "extremetech", 
-        'gizmodo', 
-        'venturebeat', 
-        'synced',
-    ];
-    const typeOptions = ["all", "AI", "Tech"];
-
-    const handleResourceOptionChange = (event) => {
-        setSelectedResourceOption(event.target.value);
-    };
-
-    const handleTypeOptionChange = (event) => {
-        setSelectedTypeOption(event.target.value);
-    };
-
-    const applyFilters = () => {
-        setFilter(selectedResourceOption);
-    }
 
     // websockets
   
@@ -109,15 +89,13 @@ function Header({ changeCurrentPage, onRefreshClick, setFilter, token }) {
         };
     }, [counter]);
 
-
-    const postData = async () => {
-        runTitleParser(selectedResourceOption)
-            .then(result => setResponse(response.data));
-    };
-
     const changePage = (page) => {
         changeCurrentPage(page);
         setCurrentPage(page);
+
+        if (location.pathname !== '/') {
+            navigate('/');
+        }
     };
 
     const doLogout = () => {
@@ -128,50 +106,32 @@ function Header({ changeCurrentPage, onRefreshClick, setFilter, token }) {
     return (
         <div className="control">
             <div className="panel__center">
-                <button className={`primary-btn ${currentPage === 'articles' ? 'primary-btn__selected' : ''}`}
-                        onClick={() => changePage('articles')}>articles</button>
-                <button className={`primary-btn ${currentPage === 'savedSummary' ? 'primary-btn__selected' : ''}`}
-                        onClick={() => changePage('savedSummary')}>saved summary</button>
-                <button className={`primary-btn ${currentPage === 'answers' ? 'primary-btn__selected' : ''}`}
-                        onClick={() => changePage('answers')}>answers</button>
-                <button className={`primary-btn ${currentPage === 'savedPosts' ? 'primary-btn__selected' : ''}`}
-                        onClick={() => changePage('savedPosts')}>saved posts</button>
+                <div className="navigation-section">
+                    <button className={`primary-btn ${currentPage === 'articles' ? 'primary-btn__selected' : ''}`}
+                            onClick={() => changePage('articles')}>articles</button>
+                    <button className={`primary-btn ${currentPage === 'savedSummary' ? 'primary-btn__selected' : ''}`}
+                            onClick={() => changePage('savedSummary')}>saved summary</button>
+                    <button className={`primary-btn ${currentPage === 'answers' ? 'primary-btn__selected' : ''}`}
+                            onClick={() => changePage('answers')}>answers</button>
+                    <button className={`primary-btn ${currentPage === 'savedPosts' ? 'primary-btn__selected' : ''}`}
+                            onClick={() => changePage('savedPosts')}>saved posts</button>
+                </div>
 
-                {/* <button className="primary-btn" onClick={onRefreshClick} >Обновить</button>
-                <div className="panel__list">
-                    <p>Выбрать категорию</p>
-                    <select value={selectedTypeOption} onChange={handleTypeOptionChange}>
-                        {typeOptions.map((option) => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </select>
+                <div className="login-section">
+                    {JWTToken === '' ? (
+                        <>
+                            <div className="button-login">
+                                <Link to="/login">Log In</Link>
+                            </div>
+                            <div className="button-signin">
+                                <Link to="/signup">Sign In</Link>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="button-logout" onClick={doLogout}>Log Out</div>                    
+                    )}
                 </div>
-                <div className="panel__list">
-                    <p>Выбрать ресурс</p>
-                    <select value={selectedResourceOption} onChange={handleResourceOptionChange}>
-                        {resourcesOptions.map((option) => (
-                            <option key={option} value={option}>
-                                {option}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-                <button className="primary-btn" onClick={applyFilters}>Применить</button>
-                <button className="primary-btn" onClick={postData}>Запустить парсер</button> */}
-                {JWTToken === '' ? (
-                    <>
-                        <div className="button-login">
-                            <Link to="/login">Log In</Link>
-                        </div>
-                        <div className="button-signin">
-                            <Link to="/signup">Sign In</Link>
-                        </div>
-                    </>
-                ) : (
-                    <div className="button-logout" onClick={doLogout}>Log Out</div>                    
-                )}
+
             </div>
 
             {/* <div className="panel__right">

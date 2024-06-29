@@ -21,10 +21,20 @@ function App() {
   const [resourcefilter, setResourcefilter] =  useState("all");
   const [token, setToken] = useState(Cookies.get('token'));
   const [currentPage, setCurrentPage] = useState('articles');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [resourceFilter, setResourceFilter] = useState('all');
+
+  const changeResource = (resourse) => {
+    setResourceFilter(resourse);
+  };
+
+  const changeCategorie = (category) => {
+    setCategoryFilter(category);
+  }
 
   const articlesPage = (<>
-    <Filters/>
-    <PostsContainer url={postContainerUrl} filter ={resourcefilter} ref={postContainerRef}/>
+    <Filters changeResource={changeResource} changeCategorie={changeCategorie}/>
+    <PostsContainer categoryFilter={categoryFilter} resourceFilter={resourceFilter} url={postContainerUrl} filter ={resourcefilter} ref={postContainerRef}/>
   </>)
 
   const answersPage = (<AnswersContainer/>);

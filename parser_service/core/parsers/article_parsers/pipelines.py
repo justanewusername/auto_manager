@@ -101,7 +101,7 @@ class TitlePostgresPipeline:
 
     def process_item(self, item, spider):
         print("i'm here!!!!")
-        self.db_manager.create_post(title=item['title'], url=item['url'])
+        self.db_manager.create_post(title=item['title'], url=item['url'], category=item['category'], resource=item['resource'])
         print("Nice!")
         return item
 

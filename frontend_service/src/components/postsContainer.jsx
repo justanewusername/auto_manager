@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
+import React, { useState, useEffect, useCallback, forwardRef, useRef, useImperativeHandle } from "react";
 import Tile from "./tile";
 import './postContainer.css';
 import config from "../config.js";
 import { getAllTitles } from "../api.js";
 
 const PostsContainer = forwardRef((props, ref) => {
+    const internalRef = useRef();
     const [posts, setPosts] = useState([]);
     let tiles = [ ];    
 
-    const getPosts = useCallback(() => {
+    const getPosts = useEffect(() => {
       let isFavorites = false;
       if(props.url === config.apiUrl + "/favorites") {
         isFavorites = true;
@@ -21,20 +22,18 @@ const PostsContainer = forwardRef((props, ref) => {
             temp = temp.filter(obj => obj['in_favorites'] === true)
             if (result != null) {
               setPosts(temp);
+              if(props.resourceFilter !== "all") {
+                setPosts(posts.filter(obj => obj['resource'] === props.resourceFilter))
+              }
+              if(props.categoryFilter !== "all") {
+                setPosts(posts.filter(obj => obj['category'] === props.categoryFilter))
+              }
             }
           } else {
             setPosts(result);
           }
         })
-    }, [props.url]);
-
-    useEffect(() => {
-      if(props.filter !== "all") {
-        setPosts(posts.filter(obj => obj['resource'] === props.filter))
-      } else {
-        getPosts()
-      }
-  }, [props.filter, getPosts]);
+    }, []);
 
 
     useImperativeHandle(ref, () => ({
@@ -56,7 +55,7 @@ const PostsContainer = forwardRef((props, ref) => {
     ));
   
     return (
-        <div>
+        <div ref={internalRef}>
             <div className="container" style={{ columnCount: 3 }}>
                 {tiles}
             </div>

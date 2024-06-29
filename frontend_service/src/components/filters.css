@@ -64,3 +64,13 @@
     border: none;
     outline: none;
 }
+
+.period-input {
+    border: 1px dotted #000;
+    width: 50px;
+}
+
+.period-input:focus {
+    border: 1px dotted #000;
+    outline: none;
+}

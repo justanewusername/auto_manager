@@ -31,3 +31,10 @@
     background-color: transparent;
 
 }
+
+.text_field {
+    margin-bottom: 40px;
+    padding: 10px;
+    max-height: 450px;
+    overflow-y: auto;
+}

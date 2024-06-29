@@ -13,11 +13,13 @@ class DatabaseManager:
         class Posts(self.Base):
             __tablename__ = "posts"
             id = Column(Integer, primary_key=True)
-            article = Column(String(32000), unique=True)
+            article =  Column(String(32000), nullable=True) #Column(String, unique=True)
+            summary = Column(String(32000), nullable=True)
             title = Column(String, nullable=True)
             url = Column(String, nullable=True)
             category = Column(String, nullable=True)
             resource = Column(String, nullable=True)
+            last_update = Column(String, nullable=True)
 
         self.Post = Posts
         self.Base.metadata.create_all(bind=self.engine)

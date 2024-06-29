@@ -36,9 +36,9 @@ class Main:
         print('user id: ', msg['user_id'])
 
         if msg['type'] == 'titles':
-            print('TITLES!!!')
             multi_parser = MultiParser()
-            multi_parser.run_title_parser(resources=msg['resources'], user_id=msg['user_id'])
+            multi_parser.run_title_parser(resources=msg['resources'], 
+                                          user_id=msg['user_id'])
         elif msg['type'] == 'articles':
             multi_parser = MultiParser()
             multi_parser.run_article_parser(msg['resources'], msg['user_id'])
